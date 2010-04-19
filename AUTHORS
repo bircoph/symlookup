@@ -1,0 +1,27 @@
+Andrew Savchenko (Bircoph)
+bircoph@users.sourceforge.net
+
+configure script is inspired by ideas of MPlayer's and FFmpeg's
+ones, but their code is *not* used in current configure script.
+
+A part of parcer.c is based on GNU Linker (ld) code, file
+emultempl/elf32.em, written by Steve Chamberlain <sac@cygnus.com>.
+
+Project:  MPlayer
+Version:  svn r24538
+Homepage: http://www.mplayerhq.hu
+License:  GNU General Public License version 2
+
+Project:  FFmpeg
+Version:  svn r10867
+Homepage: http://www.ffmpeg.org
+License:  GNU Lesser General Public License version 2.1
+          GNU General Public License version 2
+          (and some other permissive, look at the source tree
+          for details)
+
+Project:  GNU Binutils
+Version:  2.17.50.0.9
+Homepage: http://www.gnu.org/software/binutils/
+License:  GNU General Public License version 2 or any later
+

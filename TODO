@@ -1,0 +1,16 @@
+1. output: output subsystem to be flexible and extendable
+1. output: add -t and -H
+1. output: document changes
+
+2. ebuild packaging
+2. add security documentation
+2. improve subversion tree (tags, branches...)
+2. query ebuild <- file (via qfile?)
+
+3. retrieve additional symbol information (such as symbol@version);
+   use GElf_Syminfo *gelf_getsyminfo()
+3. dynamic header width adjustment and column alignment
+3. use obstacks for memory allocation speedup
+
+4. file, symbol and table types selection (is this really needed?)
+4. perhaps write russian docs, are they needed?

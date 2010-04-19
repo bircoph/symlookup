@@ -1,0 +1,286 @@
+.\" symlookup manual page
+.\" Copyright © 2007-2009 Andrew Savchenko
+.\"
+.\" This file is part of symlookup.
+.\"
+.\" symlookup is free software: you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License version 3 as
+.\" published by the Free Software Foundation
+.\"
+.\" symlookup is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License version 3 for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License version 3
+.\" along with symlookup. If not, see <http://www.gnu.org/licenses/>.
+.\"
+.TH symlookup 1 "24 Nov 2007" "version 0.3.2" "Symbol Lookup Utility"
+.SH NAME
+symlookup \- search for symbols in object files
+.SH SYNOPSIS
+
+.B symlookup
+.RI "[" options "] [" symbols "]"
+.br
+.B symlookup
+[-h | --help]
+.br
+.B symlookup
+[-v | --version]
+.br
+.SH DESCRIPTION
+
+.B symlookup
+is an utility intended for object symbols search in dynamic or static
+symbol libraries. It looks up for libraries where given symbols are
+defined and optionally can find rpms provided these libraries.
+
+By default search is performed in the standard system paths recursively, 
+in the dynamic libraries only, and omitting symbolic links. But this 
+behaviour may be fully customized by the command line options.
+Default system paths are determined in the same way as
+.BR ld (1)
+does. Refer to
+.B DEFAULT PATHS
+below for detailed information.
+
+You can use extended regular expressions for symbols definition (see
+.BR grep (1)
+for details). Another benefit of this program is a powerful sort
+engine for obtained results, see
+.B SORTING
+below.
+
+.BR rpm (1)
+support is optional and may be disabled at compile time if you
+don't need it, e.g. your distribution isn't rpm-based.
+.SH OPTIONS
+
+.TP
+.BR -a ", " --ar
+Search in the
+.BR ar (1)
+archives altogether with shared objects.
+This option is mutually exclusive with
+.BR -A " one."
+.TP
+.BR -A ", " --ar_only
+Search in the
+.BR ar (1)
+archives
+.IR only .
+This option is mutually exclusive with
+.BR -a " one."
+.TP
+.BR -d ", " --xdev
+Stay on the same physical device as search path directory.
+Useful if you don't want to descend into other file systems,
+mounted inside root search directories.
+.TP
+.BR -h ", " --help
+Show help message and exit.
+.TP
+.BR -i ", " --ignorecase
+Ignore case in symbol names or extended regular expressions.
+.P
+.BR -p ", "
+.BI "--path " <PATH1:PATH2:...>
+.RS
+Specify path(s) for library search, this will override defaults,
+not extend them. Each physical file will be analysed once, even
+for overlapped paths or multiple hardlinks.
+.RE
+.TP
+.BR -q ", " --quiet
+Omit non-fatal error messages. This will also skip some 
+non-mandatory sanity checks, thus making program running
+faster but less informative.
+.TP
+.BR -r ", " --repexp
+Treat given symbols as extended regular expressions likewise
+.BR grep (1),
+instead of search for direct match.
+.TP
+.BR -R ", " --rpm
+Search for rpms provided matched libraries. Only valid if program
+was compiled with rpm support.
+.TP
+.BR -s ", " --follow
+Follow symbolic links instead of omitting them. Be careful: often
+it is just waste of time, because symbolic links usually refer
+to the libraries in the same directory.
+.P
+.BR -S ", "
+.BI "--sort " [field,...]
+.RS
+Sort search results. You can arrange collation subsequence order,
+see
+.B SORTING
+below.
+.RE
+.TP
+.BR -v ", " --version
+Display version information and exit.
+.TP
+.BR -X ", " --noext
+Do not perform an extension check for files in question. By default
+".*\\.so\\..*" and ".*\\.so$" patterns are checked against shared
+objects and ".*\\.a$" against ar archives. (If these patterns confuse
+you, look at
+.BR grep (1)
+to understand them.)
+.SH SORTING
+
+.B symlookup
+provides rather powerful sort system for matches found. Thus it
+may be useful not only for particular symbols definition search,
+but also for analysis of large library sets or entire system.
+
+Results collation is performed sequentially according to the list
+of fields provided. Fields in the list must be separated by comma,
+no spaces, tabs and other delimiters are allowed. If short sort
+option
+.B -S
+is used the list of fields must follow option immediately, without
+any spaces. If long one is used, list must immediately follow
+the '=' sign.
+
+Valid field values are:
+.TP
+.I match
+Sort results separately for each symbol pattern provided by user;
+if neither
+.BR -i " nor " -r
+is provided this option is useless and will be ignored, because
+exact match search is performed in this case. It must be the first
+sort field if provided.
+.TP
+.I name
+Sort by symbol name (case sensitive).
+.TP
+.I file
+Sort by file name, containing matched symbols.
+.TP
+.I rpm
+Sort by rpm containing matched file; it is useless if
+.B -R
+is unspecified and will be ignored. Option is valid only if program
+compiled with rpm support.
+.P
+.RE
+Default sort sequence is
+.IR file[,rpm],symbol .
+Please note, sort is performed
+.I only
+by specified sequence (or default one). So if the last field(s) are
+unspecified, they will be unsorted:
+.IR rpm,file " and " rpm,file,symbol
+sequences may lead to different sort results.
+
+Be aware of memory usage required for sorting. It is directly
+proportional to a number of matched results. So if you want to
+use very general regexps together with sorting, you will need
+much more memory than for ordinary execution.
+
+For this stress test:
+.RS
+symlookup -arR --sort=rpm,file,symbol ".*"
+.RE
+a peak memory usage was about 137 MB on my system with about 7000
+both dynamic and static libraries installed.
+
+If you'll ever encounter "out of memory" problem, try to
+particularize search pattern or disable sort at all.
+.SH DEFAULT PATHS
+
+Default search paths are detected in the same way as
+.B ld (1)
+utility does this, so program will check all libraries available
+for an ordinary application. The following search paths are used:
+.TP
+.B 1.
+The contents of "LD_RUN_PATH" environment variable.
+.TP
+.B 2.
+The contents of "LD_LIBRARY_PATH" environment variable.
+.TP
+.B 3.
+The contents of "DT_RUNPATH" environment variable. If "DT_RUNPATH"
+is unset "DT_RPATH" entries are checked.
+.TP
+.B 4.
+The default system directories
+.IR /lib " and " /usr/lib .
+.TP
+.B 5.
+If the file
+.I /etc/ld.so.conf
+exists, the list of directories found in that file or files 
+included by that file.
+.PP
+Note: each physical file will be analysed once, even for overlapped
+paths or multiple hardlinks.
+.SH EXIT STATUS
+
+.TP
+.B 0
+Normal exit.
+.TP
+.B 1
+Parse error. This means that provided option/argument is incorrect
+or conflicting with another one. Error message provides detailed
+information about the reasons of an error.
+.TP
+.B 2
+Input/output error. Extern media is broken, perhaps bad hardware,
+pipe, network connection...
+.TP
+.B 3
+Memory allocation error. Program is running out of memory. Try to
+particularize search pattern or disable results sorting. If the
+last way doesn't help and you have at least some MBs of virtual
+memory available, please report, this may be a bug.
+.TP
+.B 4
+Fatal libelf error. Further processing is not possible. Most
+probably broken libelf library, try to upgrade.
+.TP
+.B 5
+Fatal
+.BR fts (3)
+function set error. Further processing is not possible. Usually
+this means problems with root search directory accessing or
+insufficient memory for directory tree structure. See error
+message for details.
+.SH BUGS
+
+Object files > 2GB will be skipped on 32-bit systems. But such
+cases seems to be impractical.
+.SH AUTHOR
+
+.B symlookup
+and this manual was written by Andrew Savchenko
+<bircoph@users.sourceforge.net>, feel free to mail bug reports or
+feature requests to this address.
+.SH SEE ALSO
+
+.BR readelf (1),
+.BR objdump (1),
+.BR nm (1),
+.BR ar (1)
+are useful utilities for examining internals of object files.
+.PP
+.BR elf (5)
+contains an elf file format specification.
+.PP
+.BR find (1),
+.BR locate (1),
+.BR xargs (1)
+are handy utilities for finding files.
+.PP
+.BR rpm (1)
+can be used for examination and manipulation of rpm files.
+.PP
+.BR grep (1)
+contains a description of extended regular expressions syntax.

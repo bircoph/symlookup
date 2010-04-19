@@ -1,0 +1,109 @@
+Welcome to symlookup!
+
+This is an utility for searching object symbols in system
+libraries (both dynamic and static) and not only in them.
+In particular it will be useful in troubleshooting
+"unresolved symbol" errors.
+
+This program is distributed under the terms of explicitly
+GNU GPL v.3 license. Please read LICENSE file for details.
+
+_____________
+Requirements:
+~~~~~~~~~~~~~
+- Working build suit. Even gcc 3.x would be enough, but
+  gcc 4.x is recommended for better code optimization and
+  gcc >= 4.2.0 for the most reliable CPU detection.
+
+- libelf. It is needed for processing so and ar files.
+  Version 0.123 or higher from elfutils should be enough;
+  however, program should work with older versions of
+  the library, I didn't check this though.
+
+- librpm required for rpm support, version 4.x should be 
+  enough; this is optional requirement.
+
+______________
+How to obtain:
+~~~~~~~~~~~~~~
+You can get releases from:
+https://sourceforge.net/projects/symbol-lookup/
+
+SVN repository with the latest code is available here:
+https://symbol-lookup.svn.sourceforge.net/svnroot/symbol-lookup/
+
+Use this command to obtain sources in the first time:
+svn co https://symbol-lookup.svn.sourceforge.net/svnroot/symbol-lookup symlookup
+To update code later you can just type:
+svn up
+within symlookup directory.
+
+_____________
+Installation:
+~~~~~~~~~~~~~
+Compiler and build options can be tweaked via $CC, $CFLAGS,
+$LFLAGS and $DESTDIR environment variables.
+
+To configure program type:
+./configure
+See ./configure --help for more details.
+Please note, configure script is smart enough and can detect
+even your CPU optimizations flags automatically (but better
+use gcc >= 4.2.0).
+
+To compile program type:
+make
+
+Build system honors standard install path variables.
+Currently useful $DESTDIR, $prefix, $bindir, $mandir and $docdir;
+so you may tweak install paths.
+
+To install program you may just type:
+make install
+But package-based installation is recommended.
+
+To cleanup build directory use:
+make destclean
+
+To uninstall program use:
+make uninstall
+
+_________
+Packages:
+~~~~~~~~~
+It is advisable to use some package system instead of just using
+make install. This will help to keep your system in order and will
+simplify its maintenance.
+
+Currently I'm rpm-based system user, so I can provide you only
+rpms. Use symlookup.spec to make your own one for your own
+architecture.
+
+To make rpm:
+1) copy symlookup.spec file to your SPECS dir, tune it as
+required for your system if needed;
+2) copy source tarball into your SOURCES directory;
+3) type:
+rpmbuild -bb --clean [--target=<your architecture>] symlookup.spec
+within your SPECS directory.
+4) install as root compiled rpm from SOURCES/<arch_type> directory.
+
+If you made a package of another type (deb, ebuild, etc) and want 
+to provide it for people, please let me know and I'll consider
+its inclusion in the main program source tree.
+
+______
+Usage:
+~~~~~~
+The simplest way to use the program is to type:
+symlookup symbol_name
+
+This will search in standard system paths for dynamic libraries 
+in which symbol 'symbol_name' is defined. Standard path are
+detected in the same way as ld(2) utility.
+
+This program provides a couple of useful features, such as
+regular expression handling or output customizing.
+
+Please look at manual page for details, for shorter remainder see
+symlookup -h.

@@ -1,0 +1,34 @@
+symlookup v0.3.2 Neko (猫): work in progress
+    * Project name is changed to more convenient.
+    * --disable-strip is added to configure.
+    * Support for gcc-4.3 optimizations and mfpmath sse unit.
+    * Code cleanup and optimization.
+    * Configure script optimization and improvement.
+
+symbol_lookup v0.3.1 Subaru (昴): Nov, 25, 2007
+    * Makefile improvements.
+    * Sort for the case -sort=file[,...] fixed.
+    * nftw() replaced by fts utils, thus fix open bugs.
+    * Extension check improvement: discard directory name.
+    * ld behavior is mimicked for default search path detection
+    * The same physical file will be processed only once,
+      even in case of overlapped search paths
+    * Read from stdin improved.
+
+symbol_lookup v0.3 Sachiko (幸子): Nov, 11, 2007
+    * License changed to GPL v.3.
+    * Optional rpm support implemented.
+    * Full featured configure script created.
+    * Man page created.
+    * A lot of minor bugfixes and improvements.
+    * Documentation update.
+
+symbol_lookup v0.2 Misato (郷): Jun, 27, 2007
+    * Regexp and case sensitiveness are implemented.
+    * Configurable subsequentive sort support added.
+    * Several bugs with memory allocation/dereferencing fixed.
+
+symbol_lookup v0.1: Jun, 21, 2007
+    * First draft release.
+    * Basic elf and ar lookups are fully functional.
+
