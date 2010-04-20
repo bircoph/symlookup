@@ -31,7 +31,7 @@ static inline void* xmalloc(register const size_t size)
 {
     register void* value = malloc(size);
     if (!value)
-        error(ERR_MEM, errno, "can't allocate %i bytes of memory!", size);
+        error(ERR_MEM, errno, "can't allocate %zi bytes of memory!", size);
     return value;
 }
 
@@ -40,7 +40,7 @@ static inline void* xcalloc(register const size_t count, register const size_t e
 {
     register void* value = calloc(count, eltsize);
     if (!value)
-        error(ERR_MEM, errno, "can't allocate %i bytes of memory!", count * eltsize);
+        error(ERR_MEM, errno, "can't allocate %zi bytes of memory!", count * eltsize);
     return value;
 }
 
@@ -49,7 +49,7 @@ static inline void* xrealloc(register void* const ptr, register const size_t siz
 {
     register void* value = realloc(ptr, size);
     if (!value)
-        error(ERR_MEM, errno, "can't allocate %i bytes of memory!", size);
+        error(ERR_MEM, errno, "can't allocate %zi bytes of memory!", size);
     return value;
 }
 
