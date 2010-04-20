@@ -23,9 +23,15 @@
 #include <error.h>
 #include <string.h>
 
-#include <rpm/rpmlib.h>
-#include <rpm/rpmts.h>
-#include <rpm/rpmdb.h>
+#ifndef HAVE_RPM_5
+    #include <rpmlib.h>
+    #include <rpmts.h>
+#else
+    #include <rpm4compat.h>
+    #include <rpmtag.h>
+    #define headerNVR(p,a,b,c) headerNEVRA(p,a,NULL,b,c,NULL)
+#endif //HAVE_RPM_5
+#include <rpmdb.h>
 
 #include "symlookup.h"
 #include "safemem.h"

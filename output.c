@@ -50,7 +50,8 @@ static void construct_header()
    opt.sort.seq must NOT contain MATCH_RPM if (!opt.rpm) */
 static int compare_matches(const void* const a, const void* const b)
 {
-    int result;
+    // statically initialize to shut up gcc
+    static int result = 0;
     const char** const s1 = *((const char*** const)a);
     const char** const s2 = *((const char*** const)b);
 

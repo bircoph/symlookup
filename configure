@@ -598,7 +598,6 @@ else
 fi
 [[ $_enable_rpm == "yes" ]] || [[ $_enable_rpm == "yes_5" ]] && {
     _cflags="$_cflags -DHAVE_RPM"
-    _incflags="$_incflags $_incdir_rpm"
     _libflags="$_libflags $_librpm_flags $_libdir_rpm"
     [[ $_enable_rpm == "yes_5" ]] && _cflags="$_cflags -DHAVE_RPM_5"
 }
@@ -625,6 +624,7 @@ STRIP=$_strip_cmd
 CFLAGS=$_cflags $_incflags
 LFLAGS=$LFLAGS $_libflags
 DESTDIR ?= $DESTDIR
+RPM_INCFLAGS = $_incdir_rpm
 prefix  ?= $_prefix
 bindir  ?= $_bindir
 datadir ?= $_datadir
