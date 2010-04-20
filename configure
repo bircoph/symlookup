@@ -352,15 +352,20 @@ _strip="strip"
 _cpu="auto"
 _enable_debug="no"
 _enable_cflags="no"
-# flags
+### CFLAGS
 _cflags="--std=gnu99 -Wall -D_GNU_SOURCE"
-_optflags="-O2 -funswitch-loops -fgcse-after-reload -ftree-vectorize -pipe -fwhole-program -combine"
-# for newer gcc versions
+_optflags="-O2 -funswitch-loops -fgcse-after-reload -fomit-frame-pointer -pipe"
+# tree-vectorize is broken on x86
+_optflags_x86_64="-ftree-vectorize"
+# gcc-4.3
 _optflags_gcc43="-fpredictive-commoning"
+# gcc-4.4 (-floop-block is broken and fixed only in 4.5)
+_optflags_gcc44="-ftree-loop-linear -floop-interchange -floop-strip-mine"
 # for old gcc versions
 _optflags_old="-O2 -pipe"
 # sse fpu flags
-_sse_flags="-mfpmath=sse,387"
+_sse_flags="-mfpmath=sse"
+
 # other
 _strip_flags="-s"
 _debugflags="-g3 -pipe"
@@ -461,6 +466,10 @@ echores ${_gcc_ver}.${_gcc_maj}.${_gcc_min}
         [[ $_gcc_maj -ge 3 ]] && {
             _optflags="$_optflags $_optflags_gcc43"
             log "gcc >= 4.3.0 detected, engaging additional compiler flags"
+        }
+        [[ $_gcc_maj -ge 4 ]] && {
+            _optflags="$_optflags $_optflags_gcc44"
+            log "gcc >= 4.4.0 detected, engaging additional compiler flags"
         }
     fi
 }
