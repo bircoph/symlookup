@@ -15,7 +15,7 @@
 .\" You should have received a copy of the GNU General Public License version 3
 .\" along with symlookup. If not, see <http://www.gnu.org/licenses/>.
 .\"
-.TH symlookup 1 "24 Nov 2007" "version 0.3.2" "Symbol Lookup Utility"
+.TH symlookup 1 "24 Nov 2007" "version 0.3.5" "Symbol Lookup Utility"
 .SH NAME
 symlookup \- search for symbols in object files
 .SH SYNOPSIS
@@ -81,6 +81,12 @@ mounted inside root search directories.
 .BR -h ", " --help
 Show help message and exit.
 .TP
+.BR -H ", " --header
+Show header when results are displayed as a table.
+Only valid with
+.B -t
+option.
+.TP
 .BR -i ", " --ignorecase
 Ignore case in symbol names or extended regular expressions.
 .P
@@ -119,6 +125,9 @@ see
 .B SORTING
 below.
 .RE
+.TP
+.BR -t ", " --table
+Print search results as a table.
 .TP
 .BR -v ", " --version
 Display version information and exit.

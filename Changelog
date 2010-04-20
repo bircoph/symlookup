@@ -1,7 +1,8 @@
-symlookup v0.3.2 Neko (猫): work in progress
+symlookup v0.3.5 Neko (猫): work in progress
     * Project name is changed to more convenient.
     * --disable-strip is added to configure.
-    * Support for gcc-4.3 optimizations and mfpmath sse unit.
+    * Tables support is added.
+    * Support for gcc-4.4 optimizations and mfpmath sse unit.
     * Code cleanup and optimization.
     * Configure script optimization and improvement.
 

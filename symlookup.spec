@@ -17,7 +17,7 @@
 #
 
 Name: symlookup
-Version: 0.3.2
+Version: 0.3.5
 Release: 1
 Source:  %name-%version.tar.bz2
 Summary: Object symbol search system
