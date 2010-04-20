@@ -65,60 +65,43 @@ static void grow_sym(const char* const str)
     ++symbol.size;      //+1 element
 }
 
-/*********************************************************************
- *                          SORTING UTILS                            *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * Ideas behind sort sequence:                                       *
- * opt.sort.seq[]={field1, field2, field3,...}                       *
- * opt.sort.terse[]={root1, root2, root3,...}                        *
- *                                                                   *
- * 1. Table output is straightforward:                               *
- * [ header ]                                                        *
- * field1 field2 field3 ...                                          *
- * New raw for each unique combination.                              *
- * Terse variation is inapplicable.                                  *
- *                                                                   *
- * 2. Tree output.                                                   *
- * 2.1. Normal form (non-terse: opt.sort.terse[]={-1,-1,-1}).        *
- * field1                                                            *
- *     field11                                                       *
- *         field111                                                  *
- *         field112                                                  *
- *     field12                                                       *
- *         field121                                                  *
- *         field122 (== e.g., field111)                              *
- * So this is just tab-shifted tree. Duplications in parent leafs    *
- * are possible in general.                                          *
- * 2.2. Terse form opt.sort.terse[]={-1,0,0}.                        *
- * field1                                                            *
- *     field11                                                       *
- *     field12                                                       *
- *         field111                                                  *
- *         field112                                                  *
- *         field121                                                  *
- * Fields from the same terse group are indeed equal leafs of the    *
- * tree, so there are no summary duplications, fields are compacted. *
- * Only continuous terse groups make sense, so {-1,0,-1,0} may       *
- * contain summary duplications in 4th field as they will refer to   *
- * different 3rd fields.                                             *
- *                                                                   * 
- * 3. Terse array format.                                            * 
- * Terse is in effect only if root field is followed by at least two * 
- * daughters fields without any gaps.                                * 
- * 3.1. Parsing stage.                                               * 
- * Each array element specifies the root field for corresponding     * 
- * search subsequence field in terms of enum match_types.            * 
- * Root field is denoted as -1.                                      * 
- * terse_dep[] is used at this stage.                                * 
- * 3.2 Output stage.                                                 * 
- * Root IDs are removed. Fields to be affected are specified as      * 
- * non-zero bit mask:                                                * 
- * 01: only compact field (1st field in group)                       * 
- * 10: only resort to remove duplicates (last field in group)        * 
- * 11: both compact and resort (applies for intermediate fields)     * 
- * If terse group is uncomplete (gaps, single fields) it is removed. * 
- *                                                                   * 
- *********************************************************************/
+/********************************************************************
+ *                          SORTING UTILS                           *
+ * * * * * * * * * * * * * * * * ** * * * * * * * * * * * * * * * * *
+ * Ideas behind sort sequence:                                      *
+ * opt.sort.seq[]={field1, field2, field3,...}                      *
+ * opt.sort.terse[]={terse1, terse2, terse3,...}                    *
+ *                                                                  *
+ * 1. Table output is straightforward:                              *
+ * [ header ]                                                       *
+ * field1 field2 field3 ...                                         *
+ * New raw for each unique combination.                             *
+ * Terse variation is inapplicable.                                 *
+ *                                                                  *
+ * 2. Tree output.                                                  *
+ * 2.1. Normal form (non-terse: opt.sort.terse[]={0,0,0}).          *
+ * field1                                                           *
+ *     field11                                                      *
+ *         field111                                                 *
+ *         field112                                                 *
+ *     field12                                                      *
+ *         field121                                                 *
+ *         field122 (== e.g., field111)                             *
+ * So this is just tab-shifted tree. Duplications in parent leafs   *
+ * are possible in general.                                         *
+ * 2.2. Terse form opt.sort.terse[]={0,1,1}.                        *
+ * field1                                                           *
+ *     field11                                                      *
+ *     field12                                                      *
+ *         field111                                                 *
+ *         field112                                                 *
+ *         field121                                                 *
+ * Fields from the same terse group are indeed equal leafs of the   *
+ * tree, so there are no summary duplications, fields are           *
+ * compacted. Only continuous terse groups make sense, so {0,1,0,1} *
+ * may contain summary duplications in 4th field as they will refer *
+ * to different 3rd fields.                                         * 
+ ********************************************************************/
 
 /* check for duplication of ordinary field
    without special requirements
@@ -129,7 +112,7 @@ static int check_field_ordinary_dup(const char* const str, const char* const fie
 {
     if (!strcmp(str,field)) {
         //check for duplicate
-        if (field_set & 1U << type)
+        if (field_set & (1U << type))
             error(ERR_PARSE, 0, "parse error: each sort field may arrear only once,\n"
                                 "'%s' entry duplicated", str);
         opt.sort.seq[opt.sort.cnt++] = type;
@@ -144,18 +127,13 @@ static int check_field_ordinary_dup(const char* const str, const char* const fie
 static enum match_types find_last_field(unsigned int limit)
 {
     for (enum match_types i=0; i<limit; i++)
-        if (!(field_set & 1U << i))
+        if (!(field_set & (1U << i)))
             return i;
 }
 
 /* build sort sequence and dependencies from CLI argument */
 static inline void construct_sort_sequence()
 {
-#ifdef HAVE_RPM
-    // remeber terse roots for the terse stage 1
-    int terse_dep[]={-1,-1,-1};
-#endif //HAVE_RPM
-
     // field list may be empty, then defaults should be used
     if (field_list)
     {
@@ -186,8 +164,8 @@ static inline void construct_sort_sequence()
                 {
 #ifdef HAVE_RPM
                     // check for equal level node in the output tree
-                    if (!opt.tbl && field_set & 1U << MATCH_FILE)
-                        terse_dep[opt.sort.cnt-1] = MATCH_FILE;
+                    if (!opt.tbl && field_set & (1U << MATCH_FILE))
+                        opt.sort.terse[opt.sort.cnt-1] = 1;
 #endif //HAVE_RPM
                     continue;
                 }
@@ -206,8 +184,8 @@ static inline void construct_sort_sequence()
                     if (check_field_ordinary_dup(tail, "rpm", MATCH_RPM))
                     {
                         // check for equal level node in the output tree
-                        if (!opt.tbl && field_set & 1U << MATCH_FILE)
-                            terse_dep[opt.sort.cnt-1] = MATCH_FILE;
+                        if (!opt.tbl && field_set & (1U << MATCH_FILE))
+                            opt.sort.terse[opt.sort.cnt-1] = 1;
                         continue;
                     }
                 }
@@ -239,8 +217,8 @@ static inline void construct_sort_sequence()
                 opt.sort.seq[1]=MATCH_RPM;
                 opt.sort.seq[2]=MATCH_SYM;
                 if (!opt.tbl) {
-                    terse_dep[1]=MATCH_FILE;
-                    terse_dep[2]=MATCH_FILE;
+                    opt.sort.terse[1]=1;
+                    opt.sort.terse[2]=1;
                 }
             }
             else
@@ -257,7 +235,7 @@ static inline void construct_sort_sequence()
                         opt.sort.seq[1]=MATCH_RPM;
                         opt.sort.seq[2]=MATCH_SYM;
                         if (!opt.tbl)
-                            terse_dep[1]=MATCH_FILE;
+                            opt.sort.terse[1]=1;
                         break;
                     case MATCH_RPM:
                         opt.sort.seq[1]=MATCH_FILE;
@@ -269,7 +247,7 @@ static inline void construct_sort_sequence()
                         break;
                 }
                 if (!opt.tbl)
-                    terse_dep[2]=MATCH_FILE;
+                    opt.sort.terse[2]=1;
             }
             else
 #endif //HAVE_RPM
@@ -281,33 +259,15 @@ static inline void construct_sort_sequence()
                 enum match_types last = find_last_field(3);
                 opt.sort.seq[2]=last;
                 if (!opt.tbl && ((last == MATCH_RPM) || (last == MATCH_SYM)))
-                    terse_dep[2]=MATCH_FILE;
+                    opt.sort.terse[2]=1;
             }
             break;
 #endif //HAVE_RPM
     }
 
+// at the end (opt.sort.cnt == number_of_elements_to_sort)
 #ifdef HAVE_RPM
-    // at the end (opt.sort.cnt == number_of_elements_to_sort)
     opt.sort.cnt = M_TYPES-1 + opt.rpm;
-
-    // terse stage 2:
-    // refine terse fields: prepare to the output stage
-    // Note: 1st field may not be terse by implementation
-    for (unsigned int i=1; i<opt.sort.cnt; i++)
-    {
-        if (terse_dep[i] == -1)
-            continue;
-        // check for leading root without gaps and at least one 
-        // child of the same terse group
-        if (opt.sort.seq[i-1] == terse_dep[i] &&
-            i < opt.sort.cnt-1 && terse_dep[i] == terse_dep[i+1])
-        {
-            opt.sort.terse[i] = 1;
-            //we can tag next element for sure;
-            opt.sort.terse[i+1] = 3;    // 3 == 10b & 01b
-        }
-    }
 #else
     opt.sort.cnt = M_TYPES;
 #endif //HAVE_RPM

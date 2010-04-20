@@ -89,8 +89,8 @@ struct sort_t {
     unsigned int enabled;       //sort flag
     unsigned int cnt;           //number of ssc
     unsigned int seq[M_TYPES];  //type(s) of ssc
-#ifdef HAVE_RPM                 //terse output is useless with minimal setup, at least for now
-    unsigned int terse[M_TYPES];//compression group (terse output or not, look parser.c for details)
+#ifdef HAVE_RPM //terse output is useless with minimal setup, at least for now
+    unsigned int terse[M_TYPES];//compression group (terse output or not)
 #endif //HAVE_RPM
     unsigned int match;         //sort independently for different matches
 };

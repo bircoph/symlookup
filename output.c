@@ -38,7 +38,7 @@ static void construct_header()
     for (unsigned int i=0; i<opt.sort.cnt; i++)
     {
         fputs(mtypes_str[opt.sort.seq[i]],stdout);
-        if (i < opt.sort.cnt-1)
+        if (i != opt.sort.cnt-1)
             putchar('\t');
         else
             putchar('\n');
@@ -287,7 +287,7 @@ static void print_result(char*** const match, const unsigned int count,
             for (unsigned int j=0; j < opt.sort.cnt; j++)
             {
                 fputs(match[i][type[j]], stdout);
-                if (j < opt.sort.cnt-1)
+                if (j != opt.sort.cnt-1)
                     putchar('\t');
                 else
                     putchar('\n');
@@ -295,34 +295,6 @@ static void print_result(char*** const match, const unsigned int count,
         }
         return;
     }
-    
-    /* output sorted tree */
-    // array for comparision with previous field values
-    const char **prev = (const char**)xcalloc(opt.sort.cnt, sizeof(char*));
-    char *str;
-    
-    for (unsigned int i=0; i < count; i++)
-    {
-        for (unsigned int j=0; j < opt.sort.cnt; j++)
-        {
-            //make indentation
-            for (unsigned int k=0; k<j; k++)
-                putchar('\t');
-
-            str = match[i][type[j]];
-            // output string if it belongs to the new node 
-            // or differs from previous value
-            if (!prev[j] || strcmp(prev[j],str))
-            {
-                puts(str);
-                prev[j] = str;
-                //clear all child prev strings
-                if (j < opt.sort.cnt-1)
-                    bzero(prev+j+1, sizeof(char*) * (opt.sort.cnt - j-1));
-            }
-        }
-    }
-    free(prev);
 }
 
 /* sort if required and output results */
