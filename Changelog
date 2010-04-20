@@ -1,7 +1,8 @@
 symlookup v0.3.5 Neko (猫): work in progress
-    * Project name is changed to more convenient.
+    * Project name is changed to more convenient one.
     * --disable-strip is added to configure.
-    * Tables support is added.
+    * Output may be arranged in tables.
+    * RPM version 5 support.
     * Support for gcc-4.4 optimizations and mfpmath sse unit.
     * Code cleanup and optimization.
     * Configure script optimization and improvement.

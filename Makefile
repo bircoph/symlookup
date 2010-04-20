@@ -45,7 +45,7 @@ rpmutils.o: rpmutils.c
 	$(CC) $(CFLAGS) $(RPM_INCFLAGS) -c $< -o $@
 
 symlookup: $(OBJS)
-	$(CC) $(CFLAGS) $(LFLAGS) $(OBJS) -o symlookup
+	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) -o symlookup
 	$(STRIP)
 
 install:

@@ -1,6 +1,5 @@
 1. output: output subsystem to be flexible and extendable
-1. output: document changes
-1. rpm5 support
+1. Add support for newver CPUs on SLC.
 
 2. ebuild packaging
 2. add security documentation
