@@ -38,7 +38,8 @@ Installation directories:
 
 External libraries support:
  --disable-rpm      disable rpm support [autodetect]
- --enable-rpm       enable rpm support [autodetect]
+ --enable-rpm       enable rpm4 support [autodetect]
+ --enable-rpm5      enable rpm5 support [autodetect]
  --incdir-elf=DIR   use custom include dir for libelf
  --incdir-rpm=DIR   use custom include dir for librpm
  --libdir-elf=DIR   use custom library dir for libelf
@@ -340,7 +341,7 @@ _mandir_suff="/man"
 #libraries (auto|yes|no)
 _enable_rpm="auto"
 _incdir_elf=""
-_incdir_rpm=""
+_incdir_rpm="-I/usr/include/rpm"
 _libdir_elf=""
 _libdir_rpm=""
 unset $_incflags
@@ -391,6 +392,8 @@ for ((i=1; i<=$#; i++ )); do
         --disable-rpm) _enable_rpm="no"
         ;;
         --enable-rpm)  _enable_rpm="yes"
+        ;;
+        --enable-rpm5) _enable_rpm="yes_5"
         ;;
         --cc=*)     _cc="$optarg"
         ;;
@@ -555,9 +558,7 @@ echocheck "librpm"
 if [[ $_enable_rpm == "auto" ]]
 then
     cat << EOF > $_tmpfile
-#include <rpm/rpmlib.h>
-#include <rpm/rpmts.h>
-#include <rpm/rpmdb.h>
+#include <rpmlib.h>
 
 int main() {
     rpmSetVerbosity(RPMMESS_FATALERROR);
@@ -565,22 +566,41 @@ int main() {
 EOF
     if lib_test $_librpm_flags $_incdir_rpm $_libdir_rpm;
     then
-        echores yes
+        echores "yes (using rpm-4)"
         _enable_rpm="yes"
     else
-        echores no
-        _enable_rpm="no"
+# check for rpm v5 support
+        cat << EOF > $_tmpfile
+#include <rpm4compat.h>
+
+int main() {
+    rpmSetVerbosity(RPMMESS_FATALERROR);
+}
+EOF
+        if lib_test $_librpm_flags $_incdir_rpm $_libdir_rpm;
+        then
+            echores "yes (using rpm-5)"
+            _enable_rpm="yes_5"
+        else
+
+            echores no
+            _enable_rpm="no"
+        fi
     fi
 elif [[ $_enable_rpm == "yes" ]]
 then
-    echores "yes (forced by user)"
+    echores "yes (rpm-4 forced by user)"
+elif [[ $_enable_rpm == "yes_5" ]]
+then
+    echores "yes (rpm-5 forced by user)"
 else
     echores "no (forced by user)"
 fi
-[[ $_enable_rpm == "yes" ]] && {
+[[ $_enable_rpm == "yes" ]] || [[ $_enable_rpm == "yes_5" ]] && {
     _cflags="$_cflags -DHAVE_RPM"
     _incflags="$_incflags $_incdir_rpm"
     _libflags="$_libflags $_librpm_flags $_libdir_rpm"
+    [[ $_enable_rpm == "yes_5" ]] && _cflags="$_cflags -DHAVE_RPM_5"
 }
 
 #remove temporary file
