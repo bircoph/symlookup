@@ -366,7 +366,7 @@ EOF
 
 # Fallback test if CPU is misdetected (e.g. some new CPU)
     if [[ $_cpu == "i686" ]] || [[ $_cpu == "i686" ]]
-        then cpu_test || _cpu="generic_f"
+        then cpu_test || _cpu="generic"
     fi
 }
 
@@ -583,7 +583,7 @@ then
 else
     echores $_cpu
     # Special case for misdetected CPU:
-    if [[ $_cpu == "generic_f" ]]
+    if [[ $_cpu == "generic" ]]
     then
         _march="-mtune=generic"
         echolog "*************************"
