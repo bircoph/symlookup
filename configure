@@ -25,7 +25,7 @@
 export LANG=C
 
 display_help(){
-cat << EOF
+    cat << EOF
 Usage: $0 [options...]
 
 Installation directories:
@@ -98,210 +98,271 @@ error(){
     exit 1
 }
 
-# generic gcc test
-gcc_check(){
-#cat source to logfile
-cat $_tmpfile >> $_logfile
-log
-log $_cc $_tmpfile -o ${_tmpfile}_elf "$@"
+# common part of gcc tests
+gcc_check_common(){
+    # cat source to logfile
+    cat $_tmpfile >> $_logfile
+    log
+    log $_cc $_tmpfile -o ${_tmpfile}_elf "$@"
 
-$_cc $_tmpfile -o ${_tmpfile}_elf "$@" >>$_logfile 2>&1
-res="$?"
-log
-rm -f ${_tmpfile}_elf
-return $res
+    $_cc $_tmpfile -o ${_tmpfile}_elf "$@" >>$_logfile 2>&1
+    res="$?"
+    log
+    return $res
+}
+
+# generic gcc compilation test
+gcc_check(){
+    gcc_check_common "$@"
+    rm -f ${_tmpfile}_elf
+    return $res
+}
+
+# check compilation and performance
+runtime_check(){
+    gcc_check_common "$@" || return $res
+    log
+    log "==> Running '${_tmpfile}_elf':"
+    
+    ${_tmpfile}_elf >>$_logfile 2>&1
+    res="$?"
+
+    [[ $_res == 0 ]] && log "<== succeed" || log "<== failed"
+    log
+    return $res
 }
 
 # gcc cpu parameters test
 cpu_test(){
-gcc_check -march=$_cpu
-return "$?"
+    gcc_check -march=$_cpu
+    return "$?"
 }
 
 # library parameters test
 lib_test(){
-gcc_check $_cflags "$@"
-return "$?"
+    gcc_check $_cflags "$@"
+    return "$?"
 }
 
 # cpu autodetection
 cpu_detect(){
-#check for sse support
-_sse="no"
-[[ -n "`grep flags /proc/cpuinfo | grep sse`" ]] && {
-    _sse="yes";
-    [[ $_enable_debug == "no" && $_enable_cflags == "no" ]] && {
-    #this is experimental, but try it anyway
-        _cflags="$_cflags $_sse_flags"
+    # check for sse support
+    echocheck "sse support"
+    _sse="no"
+    [[ -n "`grep flags /proc/cpuinfo | grep sse`" ]] && {
+        _sse="yes";
+        [[ $_enable_debug == "no" && $_enable_cflags == "no" ]] && {
+        #this is experimental, but try it anyway
+            _cflags="$_cflags $_sse_flags"
+        }
     }
+    echores $_sse
+
+    # Check for sse3 support.
+    # Unfortunately, /proc/cpuinfo is insufficient and x86info is not
+    # widely installed.
+    echocheck "sse3 support"
+    _sse3="(skipped)"
+    [[ $_sse == "yes" ]] && {
+        _sse3="no"
+        cat << EOF > $_tmpfile
+#include <signal.h>
+#include <stdlib.h>
+
+// catch sigill
+void handler(int signum) {
+    exit(1);
 }
 
-# gcc >= 4.2.0 supports 'native' target,
-# so cpu autodetection isn't required
-[[ _gcc_ver -ge 4 && _gcc_maj -ge 2 ]] && {
-    _cpu="native"
-    log "gcc >= 4.2.0 detected, using native architecture"
-    return
+int main() {
+    signal(SIGILL, handler);
+    __asm__ __volatile__ ("addsubpd %%xmm0, %%xmm1":::"memory");
+    return 0;
 }
+EOF
+        runtime_check && _sse3="yes"
+    }
+    echores $_sse3
 
-cpu_vendor=`gawk '{if ($1=="vendor_id") {print $3; exit}}' /proc/cpuinfo`
-cpu_family=`gawk '{if (index($0,"cpu family") == 1) {print $4; exit}}' /proc/cpuinfo`
-cpu_model=`gawk '{if ($1=="model") {print $3; exit}}' /proc/cpuinfo`
+    # gcc >= 4.2.0 supports 'native' target,
+    # so cpu autodetection isn't required
+    [[ _gcc_ver -ge 4 && _gcc_maj -ge 2 ]] && {
+        _cpu="native"
+        return
+    }
 
-# there is no need to support CPU after gcc >= 4.2.0, thus native
-# will be used in such cases
-case $cpu_vendor in
-    AuthenticAMD)
-    case $cpu_family in
-        3) _cpu="i386"
+    cpu_vendor=`gawk '{if ($1=="vendor_id") {print $3; exit}}' /proc/cpuinfo`
+    cpu_family=`gawk '{if (index($0,"cpu family") == 1) {print $4; exit}}' /proc/cpuinfo`
+    cpu_model=`gawk '{if ($1=="model") {print $3; exit}}' /proc/cpuinfo`
+
+    # there is no need to support CPU after gcc >= 4.2.0, thus native
+    # will be used in such cases
+    case $cpu_vendor in
+        AuthenticAMD)
+        case $cpu_family in
+            3) _cpu="i386"
+            ;;
+            4) _cpu="i486"
+            ;;
+            5)
+            if [[ cpu_model -le 4 ]]
+                then _cpu="i586"
+            elif [[ cpu_model -le 7 ]]
+                then _cpu="k6"
+            else
+                _cpu="k6-2"
+            fi
+            ;;
+            6)
+            # select by sse support
+            if [[ $_sse == "no" ]]
+                then _cpu="athlon"
+            else
+                _cpu="athlon-xp"
+            fi
+            ;;
+            15) _cpu="k8"
+                [[ $_sse3 == "yes" ]] && _cpu="k8-sse3"
+            ;;
+            16) _cpu="amdfam10"
+            ;;
+        esac
         ;;
-        4) _cpu="i486"
+        GenuineIntel)
+        case $cpu_family in
+            3) _cpu="i386"
+            ;;
+            4) _cpu="i486"
+            ;;
+            5)
+            if [[ cpu_model == 4 || cpu_model == 8 ]]
+                then _cpu="pentium-mmx"
+            esle
+                _cpu="pentium"
+            fi
+            ;;
+            6)
+            if [[ cpu_model -le 2 ]]
+                then _cpu="pentiumpro"
+            elif [[ cpu_model -le 6 ]]
+                then _cpu="pentium2"
+            elif [[ cpu_model -ge 15 ]]
+                then _cpu="core2"
+            elif [[ cpu_model == 9 || cpu_model -ge 13 ]]
+                then _cpu="pentium-m"
+            else
+                _cpu="pentium3"
+            fi
+            ;;
+            15)
+            if [[ cpu_model -le 2 ]]
+                then _cpu="pentium4"
+            elif [[ cpu_model == 3 ]]
+                then _cpu="prescott"
+            else
+                _cpu="nocona"
+            fi
+        esac
         ;;
-        5)
-        if [[ cpu_model -le 4 ]]
-            then _cpu="i586"
-        elif [[ cpu_model -le 7 ]]
-            then _cpu="k6"
-        else
-            _cpu="k6-2"
-        fi
+        CentaurHauls)
+        case $cpu_family in
+            5)
+            if [[ cpu_model -le 3 ]]
+                then _cpu="i586"
+            elif [[ cpu_model -le 7 ]]
+                then _cpu="winchip-c6"
+            else
+                _cpu="winchip2"
+            fi
+            ;;
+            6)
+            if [[ cpu_model -le 8 ]]
+                then _cpu="c3"
+            else
+                _cpu="c3-2"
+            fi
+            ;;
+        esac
         ;;
-        6)
-        # select by sse support
-        if [[ $_sse == "no" ]]
-            then _cpu="athlon"
-        else
-            _cpu="athlon-xp"
-        fi
-        ;;
-        15) _cpu="k8"
+        *)
+        case $cpu_family in
+            3) _cpu="i386"
+            ;;
+            4) _cpu="i486"
+            ;;
+            5) _cpu="i586"
+            ;;
+            6) _cpu="i686"
+            ;;
+        esac
         ;;
     esac
-    ;;
-    GenuineIntel)
-    case $cpu_family in
-        3) _cpu="i386"
-        ;;
-        4) _cpu="i486"
-        ;;
-        5)
-        if [[ cpu_model == 4 || cpu_model == 8 ]]
-            then _cpu="pentium-mmx"
-        esle
-            _cpu="pentium"
-        fi
-        ;;
-        6)
-        if [[ cpu_model -le 2 ]]
-            then _cpu="pentiumpro"
-        elif [[ cpu_model -le 6 ]]
-            then _cpu="pentium2"
-        elif [[ cpu_model == 9 || cpu_model -ge 13 ]]
-            then _cpu="pentium-m"
-        else
-            _cpu="pentium3"
-        fi
-        ;;
-        15)
-        if [[ cpu_model -le 2 ]]
-            then _cpu="pentium4"
-        elif [[ cpu_model == 3 ]]
-            then _cpu="prescott"
-        else
-            _cpu="nocona"
-        fi
-    esac
-    ;;
-    CentaurHauls)
-    case $cpu_family in
-        5)
-        if [[ cpu_model -le 3 ]]
-            then _cpu="i586"
-        elif [[ cpu_model -le 7 ]]
-            then _cpu="winchip-c6"
-        else
-            _cpu="winchip2"
-        fi
-        ;;
-        6)
-        if [[ cpu_model -le 8 ]]
-            then _cpu="c3"
-        else
-            _cpu="c3-2"
-        fi
-        ;;
-    esac
-    ;;
-    *)
-    case $cpu_family in
-        3) _cpu="i386"
-        ;;
-        4) _cpu="i486"
-        ;;
-        5) _cpu="i586"
-        ;;
-        6) _cpu="i686"
-        ;;
-    esac
-    ;;
-esac
 
-### check -march option,
-# old compilers may not support some options
-# suppose any compiler understand i[3456]86
+    ### check -march option,
+    # old compilers may not support some options
+    # suppose any compiler understand i[3456]86
 
-printf "int main() {return 0;}\n" > $_tmpfile
+    printf "int main() {return 0;}\n" > $_tmpfile
 
 # AMD branch
-if [[ $_cpu == "k8" ]]
-    then cpu_test || _cpu="athlon-xp"
-fi
-if [[ $_cpu == "athlon-xp" ]]
-    then cpu_test || _cpu="athlon"
-fi
-if [[ $_cpu == "athlon" ]]
-    then cpu_test || _cpu="k6-2"
-fi
-if [[ $_cpu == "k6-2" ]]
-    then cpu_test || _cpu="k6"
-fi
-if [[ $_cpu == "k6" ]]
-    then cpu_test || _cpu="i686"
-fi
+    if [[ $_cpu == "amdfam10" ]]
+        then cpu_test || _cpu="k8-sse3"
+    fi
+    if [[ $_cpu == "k8-sse3" ]]
+        then cpu_test || _cpu="k8"
+    fi
+    if [[ $_cpu == "k8" ]]
+        then cpu_test || _cpu="athlon-xp"
+    fi
+    if [[ $_cpu == "athlon-xp" ]]
+        then cpu_test || _cpu="athlon"
+    fi
+    if [[ $_cpu == "athlon" ]]
+        then cpu_test || _cpu="k6-2"
+    fi
+    if [[ $_cpu == "k6-2" ]]
+        then cpu_test || _cpu="k6"
+    fi
+    if [[ $_cpu == "k6" ]]
+        then cpu_test || _cpu="i686"
+    fi
 
 # Intel branch
-if [[ $_cpu == "nocona" ]]
-    then cpu_test || _cpu="prescott"
-fi
-if [[ $_cpu == "prescott" ]]
-    then cpu_test || _cpu="pentium4"
-fi
-if [[ $_cpu == "pentium4" ]]
-    then cpu_test || _cpu="pentium-m"
-fi
-if [[ $_cpu == "pentium-m" ]]
-    then cpu_test || _cpu="pentium3"
-fi
-if [[ $_cpu == "pentium3" ]]
-    then cpu_test || _cpu="pentium2"
-fi
-if [[ $_cpu == "pentium2" ]]
-    then cpu_test || _cpu="i686"
-fi
+    if [[ $_cpu == "core2" ]]
+        then cpu_test || _cpu="nocona"
+    fi
+    if [[ $_cpu == "nocona" ]]
+        then cpu_test || _cpu="prescott"
+    fi
+    if [[ $_cpu == "prescott" ]]
+        then cpu_test || _cpu="pentium4"
+    fi
+    if [[ $_cpu == "pentium4" ]]
+        then cpu_test || _cpu="pentium-m"
+    fi
+    if [[ $_cpu == "pentium-m" ]]
+        then cpu_test || _cpu="pentium3"
+    fi
+    if [[ $_cpu == "pentium3" ]]
+        then cpu_test || _cpu="pentium2"
+    fi
+    if [[ $_cpu == "pentium2" ]]
+        then cpu_test || _cpu="i686"
+    fi
 
 #Centaur (VIA) branch
-if [[ $_cpu == "c3-2" ]]
-    then cpu_test || _cpu="c3"
-fi
-if [[ $_cpu == "c3" ]]
-    then cpu_test || _cpu="winchip2"
-fi
-if [[ $_cpu == "winchip2" ]]
-    then cpu_test || _cpu="winchip-c6"
-fi
-if [[ $_cpu == "winchip-c6" ]]
-    then cpu_test || _cpu="i586"
-fi
+    if [[ $_cpu == "c3-2" ]]
+        then cpu_test || _cpu="c3"
+    fi
+    if [[ $_cpu == "c3" ]]
+        then cpu_test || _cpu="winchip2"
+    fi
+    if [[ $_cpu == "winchip2" ]]
+        then cpu_test || _cpu="winchip-c6"
+    fi
+    if [[ $_cpu == "winchip-c6" ]]
+        then cpu_test || _cpu="i586"
+    fi
 }
 
 #temporary file
@@ -478,7 +539,6 @@ echores ${_gcc_ver}.${_gcc_maj}.${_gcc_min}
 }
 
 # check cpu
-echocheck "target architecture"
 if [[ $_cpu == "auto" && $_enable_cflags == "no" ]]
 then
     cpu_detect
@@ -504,6 +564,10 @@ else
         _cflags="$_cflags $_sse_flags"
     fi
 fi
+
+echocheck "target architecture"
+[[ $_cpu == "native" ]] &&
+log "gcc >= 4.2.0 detected, using native architecture"
 
 # In case of forced CFLAGS we have no march at all
 # if not specified explicitly and still have _cpu=auto 

@@ -2,8 +2,8 @@
 1. Add support for newver CPUs on SLC.
 
 2. ebuild packaging
+2. portage support (via qfile)
 2. add security documentation
-2. query ebuild <- file (via qfile?)
 
 3. retrieve additional symbol information (such as symbol@version);
    use GElf_Syminfo *gelf_getsyminfo()
