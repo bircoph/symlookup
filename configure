@@ -350,7 +350,7 @@ EOF
         then cpu_test || _cpu="i686"
     fi
 
-#Centaur (VIA) branch
+# Centaur (VIA) branch
     if [[ $_cpu == "c3-2" ]]
         then cpu_test || _cpu="c3"
     fi
@@ -362,6 +362,11 @@ EOF
     fi
     if [[ $_cpu == "winchip-c6" ]]
         then cpu_test || _cpu="i586"
+    fi
+
+# Fallback test if CPU is misdetected (e.g. some new CPU)
+    if [[ $_cpu == "i686" ]] || [[ $_cpu == "i686" ]]
+        then cpu_test || _cpu="generic_f"
     fi
 }
 
@@ -577,7 +582,17 @@ then
     _march=""
 else
     echores $_cpu
-    _march="-march=$_cpu"
+    # Special case for misdetected CPU:
+    if [[ $_cpu == "generic_f" ]]
+    then
+        _march="-mtune=generic"
+        echolog "*************************"
+        echolog "WARNING! You CPU is not detected properly."
+        echolog "Please use a modern compiler (gcc >= 4.2) and report this bug."
+        echolog "*************************"
+    else
+        _march="-march=$_cpu"
+    fi
 fi
 
 # construct final cflags
