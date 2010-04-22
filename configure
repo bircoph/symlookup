@@ -158,6 +158,13 @@ cpu_detect(){
     }
     echores $_sse
 
+    # gcc >= 4.2.0 supports 'native' target,
+    # so cpu autodetection isn't required
+    [[ _gcc_ver -ge 4 && _gcc_maj -ge 2 ]] && {
+        _cpu="native"
+        return
+    }
+
     # Check for sse3 support.
     # Unfortunately, /proc/cpuinfo is insufficient and x86info is not
     # widely installed.
@@ -183,13 +190,6 @@ EOF
         runtime_check && _sse3="yes"
     }
     echores $_sse3
-
-    # gcc >= 4.2.0 supports 'native' target,
-    # so cpu autodetection isn't required
-    [[ _gcc_ver -ge 4 && _gcc_maj -ge 2 ]] && {
-        _cpu="native"
-        return
-    }
 
     cpu_vendor=`gawk '{if ($1=="vendor_id") {print $3; exit}}' /proc/cpuinfo`
     cpu_family=`gawk '{if (index($0,"cpu family") == 1) {print $4; exit}}' /proc/cpuinfo`
