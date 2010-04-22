@@ -106,7 +106,7 @@ static void readelf(Elf* const elf, const char* const filename, const unsigned i
         while ((section = elf_nextscn(elf, section))) {
             if (gelf_getshdr(section, &shdr) != &shdr) {
                 if (opt.verb)
-                    error(0, elf_errno(), "error: can't read header for section %-4d"
+                    error(0, elf_errno(), "error: can't read header for section %-4zi"
                           " in file %s", elf_ndxscn(section), filename);
                 continue;
             }
