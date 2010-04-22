@@ -127,7 +127,7 @@ runtime_check(){
     ${_tmpfile}_elf >>$_logfile 2>&1
     res="$?"
 
-    [[ $_res == 0 ]] && log "<== succeed" || log "<== failed"
+    [[ $res == 0 ]] && log "<== succeed" || log "<== failed"
     log
     return $res
 }
