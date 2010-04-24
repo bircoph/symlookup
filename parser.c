@@ -163,14 +163,7 @@ static inline void construct_sort_sequence()
                     continue;
                 }
                 if (check_field_ordinary_dup(tail, "symbol", MATCH_SYM))
-                {
-#ifdef HAVE_RPM
-                    // check for equal level node in the output tree
-                    if (!opt.tbl && field_set & (1U << MATCH_FILE))
-                        opt.sort.terse[opt.sort.cnt-1] = 1;
-#endif //HAVE_RPM
                     continue;
-                }
                 if (check_field_ordinary_dup(tail, "file", MATCH_FILE))
                     continue;
 #ifdef HAVE_RPM
@@ -184,12 +177,7 @@ static inline void construct_sort_sequence()
                         continue;
                     }
                     if (check_field_ordinary_dup(tail, "rpm", MATCH_RPM))
-                    {
-                        // check for equal level node in the output tree
-                        if (!opt.tbl && field_set & (1U << MATCH_FILE))
-                            opt.sort.terse[opt.sort.cnt-1] = 1;
                         continue;
-                    }
                 }
 #endif //HAVE_RPM
                 error(ERR_PARSE, 0, "parse error: unknown sort suboption '%s'",tail);
@@ -215,10 +203,6 @@ static inline void construct_sort_sequence()
             if (opt.rpm) {
                 opt.sort.seq[1]=MATCH_RPM;
                 opt.sort.seq[2]=MATCH_SYM;
-                if (!opt.tbl) {
-                    opt.sort.terse[1]=1;
-                    opt.sort.terse[2]=1;
-                }
             }
             else
 #endif //HAVE_RPM
@@ -227,14 +211,11 @@ static inline void construct_sort_sequence()
         case 1:
 #ifdef HAVE_RPM
             if (opt.rpm)
-            {
                 switch (opt.sort.seq[0])
                 {
                     case MATCH_FILE:
                         opt.sort.seq[1]=MATCH_RPM;
                         opt.sort.seq[2]=MATCH_SYM;
-                        if (!opt.tbl)
-                            opt.sort.terse[1]=1;
                         break;
                     case MATCH_RPM:
                         opt.sort.seq[1]=MATCH_FILE;
@@ -244,9 +225,6 @@ static inline void construct_sort_sequence()
                         opt.sort.seq[1]=MATCH_FILE;
                         opt.sort.seq[2]=MATCH_RPM;
                         break;
-                }
-                if (!opt.tbl)
-                    opt.sort.terse[2]=1;
             }
             else
 #endif //HAVE_RPM
@@ -254,12 +232,8 @@ static inline void construct_sort_sequence()
             break;
 #ifdef HAVE_RPM
         case 2:
-            if (opt.rpm) {
-                enum match_types last = find_last_field(3);
-                opt.sort.seq[2]=last;
-                if (!opt.tbl && ((last == MATCH_RPM) || (last == MATCH_SYM)))
-                    opt.sort.terse[2]=1;
-            }
+            if (opt.rpm)
+                opt.sort.seq[2]=find_last_field(3);
             break;
 #endif //HAVE_RPM
     }
@@ -270,6 +244,27 @@ static inline void construct_sort_sequence()
 #else
     opt.sort.cnt = M_TYPES;
 #endif //HAVE_RPM
+
+    /* Terse output is useless for the table. */
+    if (opt.tbl)
+        return;
+
+    /* Enable terse output for SYM and RPM fields occuring after FILE field. */
+    unsigned int has_file_field = 0;
+    for (unsigned int i=0; i<opt.sort.cnt; i++)
+        switch (opt.sort.seq[i])
+        {
+            case MATCH_FILE:
+                has_file_field = 1;
+                break;
+#ifdef HAVE_RPM
+            case MATCH_RPM:
+#endif //HAVE_RPM
+            case MATCH_SYM:
+                if (has_file_field)
+                    opt.sort.terse[i] = 1;
+                break;
+        }
 }
 
 /****************************************************************
