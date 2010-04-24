@@ -180,12 +180,10 @@ compiled with rpm support.
 .RE
 Default sort sequence is
 .IR file[,rpm],symbol .
-Please note, sort is performed
-.I only
-by specified sequence (or default one). So if the last field(s) are
-unspecified, they will be unsorted:
-.IR rpm,file " and " rpm,file,symbol
-sequences may lead to different sort results.
+This also affect
+.I match
+sorting. If not all fields will be specified, sane defaults will be
+used to complete the sequence.
 
 Be aware of memory usage required for sorting. It is directly
 proportional to a number of matched results. So if you want to
