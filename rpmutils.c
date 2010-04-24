@@ -117,7 +117,10 @@ void listrpm(const char *const filename, const char *const symbolname,
     if (!rpm_arr->size)
         //table output is different a bit
         if (opt.tbl)
-            printf(outfmt, filename, str_no_match, symbolname);
+            if (!opt.sort.match)
+                printf(outfmt, filename, str_no_match, symbolname);
+            else
+                printf(outfmt, pattern, filename, str_no_match, symbolname);
         else
             list = alloc_str(str_no_match);
     else {
