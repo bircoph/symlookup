@@ -126,12 +126,12 @@ void listrpm(const char *const filename, const char *const symbolname,
     else {
         //new raw in table for each entry
         if (opt.tbl)
-            if (opt.sort.match)
-                for (unsigned int i=0; i < rpm_arr->size; i++)
-                    printf(outfmt, pattern, filename, rpm_arr->str[i], symbolname);
-            else
+            if (!opt.sort.match)
                 for (unsigned int i=0; i < rpm_arr->size; i++)
                     printf(outfmt, filename, rpm_arr->str[i], symbolname);
+            else
+                for (unsigned int i=0; i < rpm_arr->size; i++)
+                    printf(outfmt, pattern, filename, rpm_arr->str[i], symbolname);
 
         else
         {
