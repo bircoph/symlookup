@@ -366,7 +366,7 @@ EOF
 
 # Fallback test if CPU is misdetected (e.g. some new CPU)
     if [[ $_cpu == "i686" ]] || [[ $_cpu == "i686" ]]
-        then cpu_test || _cpu="generic"
+        then cpu_test || _cpu_t="generic"
     fi
 }
 
@@ -411,12 +411,13 @@ _incdir_rpm="-I/usr/include/rpm"
 _libdir_elf=""
 _libdir_rpm=""
 _libflags="--Wl,O1"
-unset $_incflags
+unset _incflags
 
 #compilation
 _cc=${CC:="gcc"}
 _strip="strip"
-_cpu="auto"
+_cpu_t="auto"
+unset _cpu
 _enable_debug="no"
 _enable_cflags="no"
 ### CFLAGS
@@ -473,7 +474,7 @@ for ((i=1; i<=$#; i++ )); do
         ;;
         --libdir-rpm=*) _libdir_rpm="-L$optarg"
         ;;
-        --cpu=*) _cpu="$optarg"
+        --cpu=*) _cpu="$optarg"; _cpu_t="manual"
         ;;
         --enable-debug) _enable_debug="yes"
         ;;
@@ -544,7 +545,7 @@ echores ${_gcc_ver}.${_gcc_maj}.${_gcc_min}
 }
 
 # check cpu
-if [[ $_cpu == "auto" && $_enable_cflags == "no" ]]
+if [[ $_cpu_t == "auto" && $_enable_cflags == "no" ]]
 then
     cpu_detect
 else
@@ -575,22 +576,23 @@ echocheck "target architecture"
 log "gcc >= 4.2.0 detected, using native architecture"
 
 # In case of forced CFLAGS we have no march at all
-# if not specified explicitly and still have _cpu=auto 
-if [[ $_cpu == "auto" ]]
+# if not specified explicitly and still have zero $_cpu 
+if [[ -z $_cpu ]]
 then
     echores "not specified and CFLAGS are forced"
     _march=""
 else
-    echores $_cpu
     # Special case for misdetected CPU:
-    if [[ $_cpu == "generic" ]]
+    if [[ $_cpu_t == "generic" ]]
     then
         _march="-mtune=generic"
+        echores "generic tuning"
         echolog "*************************"
         echolog "WARNING! You CPU is not detected properly."
         echolog "Please use a modern compiler (gcc >= 4.2) and report this bug."
         echolog "*************************"
     else
+        echores $_cpu
         _march="-march=$_cpu"
     fi
 fi
@@ -608,7 +610,7 @@ else
     echores no
     str="Your compiler seems to be broken, check your system."
     [[ $_enable_cflags == "yes" ]] && str="${str}\nOr your CFLAGS are bad."
-    [[ $_cpu != "auto" ]] && str="${str}\nOr your CPU type is bad."
+    [[ $_cpu_t == "manual" ]] && str="${str}\nOr your CPU type is bad."
     error "$str"
 fi
 
