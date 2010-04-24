@@ -1,6 +1,6 @@
 /*
  *  general safe memory allocation routines
- *  Copyright © 2007-2009 Andrew Savchenko
+ *  Copyright © 2007-2010 Andrew Savchenko
  *
  *  This file is part of symlookup.
  *
