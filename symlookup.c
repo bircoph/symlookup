@@ -91,9 +91,6 @@ struct opt_t opt = {
                    ,0
 #endif //HAVE_RPM
                    },
-#ifdef HAVE_RPM
-        .terse   = {0,0,0},
-#endif //HAVE_RPM
         .match   = 0
     }
 };

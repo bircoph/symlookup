@@ -70,7 +70,6 @@ static void grow_sym(const char* const str)
  * * * * * * * * * * * * * * * * ** * * * * * * * * * * * * * * * * *
  * Ideas behind sort sequence:                                      *
  * opt.sort.seq[]={field1, field2, field3,...}                      *
- * opt.sort.terse[]={terse1, terse2, terse3,...}                    *
  *                                                                  *
  * 1. Table output is straightforward:                              *
  * [ header ]                                                       *
@@ -79,7 +78,7 @@ static void grow_sym(const char* const str)
  * Terse variation is inapplicable.                                 *
  *                                                                  *
  * 2. Tree output.                                                  *
- * 2.1. Normal form (non-terse: opt.sort.terse[]={0,0,0}).          *
+ * 2.1. Normal form (non-terse).                                    *
  * field1                                                           *
  *     field11                                                      *
  *         field111                                                 *
@@ -89,7 +88,7 @@ static void grow_sym(const char* const str)
  *         field122 (== e.g., field111)                             *
  * So this is just tab-shifted tree. Duplications in parent leafs   *
  * are possible in general.                                         *
- * 2.2. Terse form opt.sort.terse[]={0,1,1}.                        *
+ * 2.2. Terse form. Only valid after MATCH_FILE field.              *
  * field1                                                           *
  *     field11                                                      *
  *     field12                                                      *
@@ -98,9 +97,7 @@ static void grow_sym(const char* const str)
  *         field121                                                 *
  * Fields from the same terse group are indeed equal leafs of the   *
  * tree, so there are no summary duplications, fields are           *
- * compacted. Only continuous terse groups make sense, so {0,1,0,1} *
- * may contain summary duplications in 4th field as they will refer *
- * to different 3rd fields.                                         * 
+ * compacted.                                                       *
  ********************************************************************/
 
 /* check for duplication of ordinary field
@@ -244,27 +241,6 @@ static inline void construct_sort_sequence()
 #else
     opt.sort.cnt = M_TYPES;
 #endif //HAVE_RPM
-
-    /* Terse output is useless for the table. */
-    if (opt.tbl)
-        return;
-
-    /* Enable terse output for SYM and RPM fields occuring after FILE field. */
-    unsigned int has_file_field = 0;
-    for (unsigned int i=0; i<opt.sort.cnt; i++)
-        switch (opt.sort.seq[i])
-        {
-            case MATCH_FILE:
-                has_file_field = 1;
-                break;
-#ifdef HAVE_RPM
-            case MATCH_RPM:
-#endif //HAVE_RPM
-            case MATCH_SYM:
-                if (has_file_field)
-                    opt.sort.terse[i] = 1;
-                break;
-        }
 }
 
 /****************************************************************
