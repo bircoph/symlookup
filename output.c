@@ -306,7 +306,7 @@ void sort_output()
     {
         if (opt.hdr)
         {
-            fputs("PATTERN\t",stdout);
+            fputs("PATTERN\t\t",stdout);
             construct_header();
         }
         for (unsigned int i=0; i < symbol.size; i++) {
