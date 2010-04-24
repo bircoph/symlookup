@@ -136,6 +136,11 @@ static void print_result(char*** const match, const unsigned int count,
 
             puts(str);
             prev_str[j] = str; // save current string
+
+            /* terse output section */
+            if (j != MATCH_FILE || j == opt.sort.cnt - 1)
+                return;
+
         }
 }
 
