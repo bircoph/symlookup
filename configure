@@ -436,7 +436,7 @@ _sse_flags="-mfpmath=sse"
 
 # other
 _strip_flags="-s"
-_debugflags="-g3 -pipe"
+_debugflags="-ggdb3 -pipe"
 _libelf_flags="-lelf"
 _librpm_flags="-lrpm"
 
