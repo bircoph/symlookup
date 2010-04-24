@@ -41,7 +41,7 @@ all: $(DEPS) symlookup
 
 # rpm's fts conflicts with system-wide one,
 # so include rpm inc dir only when needed
-rpmutils.o: rpmutils.c
+rpmutils.o: rpmutils.c rpmutils.h
 	$(CC) $(CFLAGS) $(RPM_INCFLAGS) -c $< -o $@
 
 symlookup: $(OBJS)
@@ -74,3 +74,8 @@ uninstall:
 	rm -f $(DESTDIR)$(bindir)/symlookup
 	rm -rf $(DESTDIR)$(docdir)/symlookup
 	rm -f $(DESTDIR)$(mandir)/man1/symlookup.1.gz
+
+# on distclean per-file deps will be removed anyway
+ifneq ($(MAKECMDGOALS),distclean)
+-include $(DEPS)
+endif
