@@ -111,6 +111,32 @@ static void print_result(char*** const match, const unsigned int count,
         }
         return;
     }
+
+    char *prev_str[M_TYPES], // array of pointers to previously printed strings
+         *str;               // string for temporal reference
+    // top prev str layer should be cleaned outside the main loop
+    prev_str[0] = NULL;
+
+    /* tree output */
+    for (unsigned int i=0; i < count; i++)
+        for (unsigned int j=0; j < opt.sort.cnt; j++)
+        {
+            str = match[i][type[j]];
+
+            // skip previously printed element
+            if (prev_str[j] && !strcmp(prev_str[j], str))
+                continue;
+
+            // clear previous string flag from inner layer
+            if (j < opt.sort.cnt - 1)
+                prev_str[j+1] = NULL;
+
+            for (unsigned int z=0; z < j; z++)
+                putchar('\t');
+
+            puts(str);
+            prev_str[j] = str; // save current string
+        }
 }
 
 /* sort if required and output results */
