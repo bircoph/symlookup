@@ -86,8 +86,7 @@ extern struct match_arr_t match_arr;
 
 /* subsequent sort comparision (ssc) options */
 struct sort_t {
-    unsigned int enabled;       //sort flag
-    unsigned int cnt;           //number of ssc
+    unsigned int cnt;           //number of ssc, zero stands for disabled sort
     unsigned int seq[M_TYPES];  //type(s) of ssc
 #ifdef HAVE_RPM //terse output is useless with minimal setup, at least for now
     unsigned int terse[M_TYPES];//compression group (terse output or not)

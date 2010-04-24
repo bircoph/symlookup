@@ -85,7 +85,6 @@ struct opt_t opt = {
     .re   = 0,
     .fts  = FTS_PHYSICAL,
     { /* sort */
-        .enabled = 0,
         .cnt     = 0,
         .seq     = {0,0
 #ifdef HAVE_RPM
@@ -123,7 +122,7 @@ static inline void free_unused()
 
     /* we don't need rpm storage anymore if
        we do not use sorting */
-    if (opt.rpm && !opt.sort.enabled) {
+    if (opt.rpm && !opt.sort.cnt) {
         free_str(rpm_arr);
         free(rpm_arr);
     }
@@ -144,7 +143,7 @@ void do_match(const unsigned int i, const char* const filename,
                                     const char* const symbolname)
 {
     //don't sort => print immediately
-    if (!opt.sort.enabled) {
+    if (!opt.sort.cnt) {
 #ifdef HAVE_RPM
         if (opt.rpm) //engage rpm support
             listrpm(filename, symbolname, NULL);
@@ -188,7 +187,7 @@ void do_match(const unsigned int i, const char* const filename,
         //the same separate allocation as for filename,
         //but str_t itself
 #ifdef HAVE_RPM
-        if (opt.rpm && opt.sort.cnt) {
+        if (opt.rpm) {
             rpm_arr = xrealloc(rpm_arr, sizeof(struct str_t) * file_arr.size);
             rpm_check(filename, &rpm_arr[file_arr.size-1]);
         }
@@ -199,7 +198,7 @@ void do_match(const unsigned int i, const char* const filename,
 
 #ifdef HAVE_RPM
     static char *const str_rpmnf = "<rpm not found>";
-    if (opt.rpm && opt.sort.cnt) {
+    if (opt.rpm) {
         static struct str_t *rpmname;
         rpmname = &rpm_arr[file_arr.size-1];
         //str_rpmnf <=> no match message
@@ -237,7 +236,7 @@ void do_match(const unsigned int i, const char* const filename,
 
 #ifdef HAVE_RPM
         //multiple rpm match leads to several formal matches
-        if (opt.rpm && opt.sort.cnt)
+        if (opt.rpm)
         {
             static unsigned int rpmcount;
             rpmcount = rpm_arr[file_arr.size-1].size;
@@ -415,7 +414,7 @@ int main(const int argc, char *const argv[])
     }
 
     /* sort if required and output results */
-    if (opt.sort.enabled)
+    if (opt.sort.cnt)
         sort_output();
     else if (opt.verb && !matches_found)
         puts(str_not_found);

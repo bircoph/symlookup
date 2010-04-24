@@ -134,6 +134,8 @@ static enum match_types find_last_field(unsigned int limit)
 /* build sort sequence and dependencies from CLI argument */
 static inline void construct_sort_sequence()
 {
+    // reset sort counter, it was set just as a bool flag before
+    opt.sort.cnt = 0;
     // field list may be empty, then defaults should be used
     if (field_list)
     {
@@ -208,9 +210,6 @@ static inline void construct_sort_sequence()
     switch (opt.sort.cnt)
     {
         case 0:
-            //do not sort if only match is requested
-            if (opt.sort.match)
-                return;
             opt.sort.seq[0]=MATCH_FILE;
 #ifdef HAVE_RPM
             if (opt.rpm) {
@@ -563,7 +562,7 @@ void parse(const int argc, char* const argv[])
                 break;
 #endif //HAVE_RPM
             case 'S':
-                opt.sort.enabled = 1;
+                opt.sort.cnt = 1;
                 if (optarg) {
                     // -S is specified more than once...
                     if (field_list) {
@@ -617,7 +616,7 @@ void parse(const int argc, char* const argv[])
 
     /* parse sort suboptions, this can't be done in the main switch
        due to dependance on other suboptions */
-    if (opt.sort.enabled == 1)
+    if (opt.sort.cnt)
         construct_sort_sequence();
 
     /* read from stdin if no symbols are specified */

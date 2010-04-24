@@ -46,7 +46,7 @@ static void construct_header()
 }
 
 /* Comparison function for ordinary matches.
-   It must be called only if ordinary sort is enabled (opt.sort.enabled),
+   It must be called only if ordinary sort is enabled (opt.sort.cnt),
    opt.sort.seq must NOT contain MATCH_RPM if (!opt.rpm) */
 static int compare_matches(const void* const a, const void* const b)
 {
@@ -314,34 +314,9 @@ void sort_output()
                 continue;
             if (!opt.tbl)
                 printf("===> match(es) for pattern '%s':\n", symbol.str[i]);
-            /* print unsorted resusts */
-            if (!opt.sort.cnt)
-                if (opt.verb && !symbol.match_count[i])
-                    if (!opt.tbl)
-                        puts(str_not_found);
-                    else
-                        printf("%s\t%s\n", symbol.str[i], str_not_found);
-                else
-#ifdef HAVE_RPM
-                    if (opt.rpm)
-                        for (unsigned int j=0; j < symbol.match_count[i]; j++)
-                            listrpm(symbol.match[i][j][MATCH_FILE], symbol.match[i][j][MATCH_SYM],
-                                    symbol.str[i]);
-                    else
-#endif //HAVE_RPM
-                        for (unsigned int j=0; j < symbol.match_count[i]; j++)
-                        {
-                            if (opt.tbl) {
-                                fputs(symbol.str[i],stdout);
-                                putchar('\t');
-                            }
 
-                            printf(outfmt, symbol.match[i][j][MATCH_FILE],
-                                                 symbol.match[i][j][MATCH_SYM]);
-                        }
-            else
-                /* use standard output facility */
-                print_result(symbol.match[i], symbol.match_count[i], symbol.str[i]);
+            /* use standard output facility */
+            print_result(symbol.match[i], symbol.match_count[i], symbol.str[i]);
 
         }
     } // opt.sort.match
@@ -369,7 +344,7 @@ void init_output()
         outfmt = "%s:\t%s\n";
 
     /* show unsorted output header for the first time */
-    if (opt.hdr && !opt.sort.enabled)
+    if (opt.hdr && !opt.sort.cnt)
     {
 #ifdef HAVE_RPM
         if (opt.rpm)
