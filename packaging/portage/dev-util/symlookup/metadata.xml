@@ -5,5 +5,4 @@
 <use>
   <flag name='rpm'>Enable support for RPM database query. May be useful if <pkg>app-arch/rpm</pkg> is used to install packages outside of portage</flag>
 </use>
--->
 </pkgmetadata>
