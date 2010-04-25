@@ -50,7 +50,7 @@ rpmutils.o: rpmutils.c rpmutils.h
 endif
 
 symlookup: $(OBJS)
-	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) -o symlookup
+	$(CC) $(CFLAGS) $(OBJS) $(LDFLAGS) -o symlookup
 	$(STRIP)
 
 install:
