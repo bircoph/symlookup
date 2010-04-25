@@ -22,9 +22,10 @@ include config.mak
 
 SRCS = output.c \
        parser.c \
-       rpmutils.c \
        scanelf.c \
        symlookup.c
+# add optional sources to the list
+SRCS += $(SRCS-OPT)
 
 OBJS = $(SRCS:.c=.o)
 DEPS = $(SRCS:.c=.d)
