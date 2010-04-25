@@ -27,8 +27,8 @@ Group: System/Utilities
 Prefix: %_prefix
 BuildRoot: %_tmppath/%name
 Obsoletes: symbol_lookup
-Requires: elfutils-libelf
-BuildRequires: elfutils-libelf-devel
+Requires: elfutils-libelf rpm-libs
+BuildRequires: elfutils-libelf-devel rpm-devel
 
 %description
 symlookup is an utility intended for object symbols search in
