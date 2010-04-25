@@ -34,6 +34,7 @@
 #include "symlookup.h"
 #include "safemem.h"
 #include "parser.h"
+#include "version.h"
 
 /* buffer size for reading lines */
 static size_t line_buf = 512;
@@ -484,7 +485,7 @@ void parse(const int argc, char* const argv[])
                 exit(0);
             case 'v':
                 puts(
-                    "symlookup ver. 0.3.2\n"
+                    "symlookup ver. " VERSION "\n"
                     "license: GNU GPLv.3\n"
 #ifdef HAVE_RPM
                     "rpm support: yes"

@@ -58,7 +58,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %changelog
 * Sun Apr 25 2010 Savchenko Andrew <bircoph@users.sourceforge.net>
-- updated for v0.3.2
+- updated for v0.3.5
 
 * Wed Jun 27 2007 Savchenko Andrew <bircoph@users.sourceforge.net>
 - initial RPM

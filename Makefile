@@ -55,14 +55,14 @@ symlookup: $(OBJS)
 
 install:
 	install -d $(DESTDIR)$(bindir) \
-		   $(DESTDIR)$(docdir)/symlookup \
+		   $(DESTDIR)$(docdir)/symlookup-$(VERSION) \
 		   $(DESTDIR)$(mandir)/man1
-	install -m 0755 symlookup  $(DESTDIR)$(bindir)/symlookup
-	install -m 0644 AUTHORS   $(DESTDIR)$(docdir)/symlookup
-	install -m 0644 Changelog $(DESTDIR)$(docdir)/symlookup
-	install -m 0644 LICENSE   $(DESTDIR)$(docdir)/symlookup
-	install -m 0644 README    $(DESTDIR)$(docdir)/symlookup
-	install -m 0644 TODO      $(DESTDIR)$(docdir)/symlookup
+	install -m 0755 symlookup  $(DESTDIR)$(bindir)/symlookup-$(VERSION)
+	install -m 0644 AUTHORS   $(DESTDIR)$(docdir)/symlookup-$(VERSION)
+	install -m 0644 Changelog $(DESTDIR)$(docdir)/symlookup-$(VERSION)
+	install -m 0644 LICENSE   $(DESTDIR)$(docdir)/symlookup-$(VERSION)
+	install -m 0644 README    $(DESTDIR)$(docdir)/symlookup-$(VERSION)
+	install -m 0644 TODO      $(DESTDIR)$(docdir)/symlookup-$(VERSION)
 	install -m 0644 symlookup.1	$(DESTDIR)$(mandir)/man1/symlookup.1
 
 clean:
