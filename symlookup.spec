@@ -20,7 +20,7 @@ Name: symlookup
 Version: 0.3.5
 Release: 1
 Source:  %name-%version.tar.bz2
-Summary: Object symbol search system
+Summary: Object symbol search utility
 License: GPL
 URL: https://symbol-lookup.sourceforge.net
 Group: System/Utilities
@@ -57,8 +57,8 @@ rm -rf $RPM_BUILD_ROOT
 rm -rf $RPM_BUILD_ROOT
 
 %changelog
-* Wed Jun 27 2007 Savchenko Andrew <bircoph@list.ru>
-- updated for v0.3
+* Sun Apr 25 2010 Savchenko Andrew <bircoph@users.sourceforge.net>
+- updated for v0.3.2
 
-* Wed Jun 27 2007 Savchenko Andrew <bircoph@list.ru>
+* Wed Jun 27 2007 Savchenko Andrew <bircoph@users.sourceforge.net>
 - initial RPM
