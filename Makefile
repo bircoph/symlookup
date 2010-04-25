@@ -57,7 +57,7 @@ install:
 	install -d $(DESTDIR)$(bindir) \
 		   $(DESTDIR)$(docdir)/symlookup-$(VERSION) \
 		   $(DESTDIR)$(mandir)/man1
-	install -m 0755 symlookup  $(DESTDIR)$(bindir)/symlookup-$(VERSION)
+	install -m 0755 symlookup  $(DESTDIR)$(bindir)/symlookup
 	install -m 0644 AUTHORS   $(DESTDIR)$(docdir)/symlookup-$(VERSION)
 	install -m 0644 Changelog $(DESTDIR)$(docdir)/symlookup-$(VERSION)
 	install -m 0644 LICENSE   $(DESTDIR)$(docdir)/symlookup-$(VERSION)
