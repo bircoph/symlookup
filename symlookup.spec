@@ -40,7 +40,7 @@ libraries.
 %setup -q -n %name
 
 %build
-%configure
+%configure --disable-strip
 make %?_smp_mflags
 
 %install
