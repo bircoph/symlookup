@@ -24,8 +24,10 @@ SRCS = output.c \
        parser.c \
        scanelf.c \
        symlookup.c
-# add optional sources to the list
-SRCS += $(SRCS-OPT)
+
+ifdef HAVE_RPM
+SRCS += rpmutils.c
+endif
 
 OBJS = $(SRCS:.c=.o)
 DEPS = $(SRCS:.c=.d)
@@ -42,8 +44,10 @@ all: $(DEPS) symlookup
 
 # rpm's fts conflicts with system-wide one,
 # so include rpm inc dir only when needed
+ifdef HAVE_RPM
 rpmutils.o: rpmutils.c rpmutils.h
 	$(CC) $(CFLAGS) $(RPM_INCFLAGS) -c $< -o $@
+endif
 
 symlookup: $(OBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) -o symlookup
