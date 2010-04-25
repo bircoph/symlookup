@@ -67,6 +67,68 @@ static int compare_matches(const void* const a, const void* const b)
     return result;
 }
 
+/* Comparison function for matches within fixed level.
+   It must be called only from terse output subsystem,
+   opt.sort.seq must NOT contain MATCH_RPM if (!opt.rpm).
+   External variable comparision_level is used to denote level to compare,
+   as it can't be passed to the function directly */
+unsigned int comparision_level;
+static int compare_level(const void* const a, const void* const b)
+{
+    const char** const s1 = *((const char*** const)a);
+    const char** const s2 = *((const char*** const)b);
+
+    /* compare single level match results */
+    return strcmp(s1[opt.sort.seq[comparision_level]],
+                  s2[opt.sort.seq[comparision_level]]);
+}
+
+/* Print subtree in a terse mode:
+ * at each level there're no duplicated nodes.
+ * match -- match array to process
+ * count -- number of elements in match array
+ * start -- index of the first element to process
+ * level -- highest level of a tree to process (should be valid) */
+static unsigned int
+terse_output(char*** const match, const unsigned int count,
+             const unsigned int start, const unsigned int level)
+{
+    unsigned int end;
+    unsigned int *type = opt.sort.seq;
+
+    // find the end of the terse block
+    for (end = start; end < count - 1; end++)
+        if (strcmp(match[end][type[level-1]], match[end+1][type[level-1]]))
+        {
+            end++;
+            break;
+        }
+
+    for (unsigned int j = level; j < opt.sort.cnt; j++)
+    {
+        // all terse levels with (depth > 1) must be resorted
+        if (j > level)
+        {
+            comparision_level = j;
+            qsort(match + start, end - start + 1, sizeof(char**), compare_level);
+        }
+
+        for (unsigned int i = start; i <= end; i++)
+        {
+            // skip previously printed element
+            if (i > start && !strcmp(match[i][type[j]], match[i-1][type[j]]))
+                continue;
+
+            for (unsigned int z=0; z < j; z++)
+                putchar('\t');
+
+            puts(match[i][type[j]]);
+        }
+    }
+
+    return end;
+}
+
 /* Output sorted results.
  * match   -- match structure 
  * count   -- number of matches
@@ -138,8 +200,11 @@ static void print_result(char*** const match, const unsigned int count,
             prev_str[j] = str; // save current string
 
             /* terse output section */
-            if (j != MATCH_FILE || j == opt.sort.cnt - 1)
-                return;
+            if (type[j] == MATCH_FILE && j < opt.sort.cnt - 1)
+            {
+                i = terse_output(match, count, i, j+1);
+                break;
+            }
 
         }
 }
