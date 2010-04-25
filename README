@@ -80,7 +80,7 @@ It is advisable to use some package system instead of just using
 make install. This will help to keep your system in order and will
 simplify its maintenance.
 
-Currently only rpms for Scientific Linux CERN and ebuild for Gentoo
+Currently only rpm for Scientific Linux CERN and ebuild for Gentoo
 are provided.
 
 Put ebuild in your local overlay and use it as usual.
@@ -90,8 +90,10 @@ To make your own rpm for desired architecture:
 required for your system if needed;
 2) copy source tarball into your SOURCES directory;
 3) type:
-rpmbuild -bb --clean [--target=<your architecture>] symlookup.spec
+rpmbuild -bb --clean symlookup.spec
 within your SPECS directory.
+If you need to use system wide CFLAGS, add --enable-cflags to
+configure script.
 4) install as root compiled rpm from SOURCES/<arch_type> directory.
 
 If you made a package of another type (deb, etc) and want 
