@@ -99,10 +99,7 @@ terse_output(char*** const match, const unsigned int count,
     // find the end of the terse block
     for (end = start; end < count - 1; end++)
         if (strcmp(match[end][type[level-1]], match[end+1][type[level-1]]))
-        {
-            end++;
             break;
-        }
 
     for (unsigned int j = level; j < opt.sort.cnt; j++)
     {
