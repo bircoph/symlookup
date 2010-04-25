@@ -410,7 +410,7 @@ _incdir_elf=""
 _incdir_rpm="-I/usr/include/rpm"
 _libdir_elf=""
 _libdir_rpm=""
-_libflags="--Wl,O1"
+LDFLAGS+="--Wl,O1"
 unset _incflags
 
 #compilation
@@ -633,7 +633,7 @@ else
     error "libelf is mandatory, please install it properly\nor specify correct headers and shared object paths"
 fi
 _incflags+=" $_incdir_elf"
-_libflags+=" $_libelf_flags $_libdir_elf"
+_libs+=" $_libelf_flags $_libdir_elf"
 
 # rpm support
 echocheck "librpm"
@@ -681,7 +681,7 @@ fi
 [[ $_enable_rpm == "yes" ]] || [[ $_enable_rpm == "yes_5" ]] && {
     _have_rpm="HAVE_RPM = yes"
     _cflags+=" -DHAVE_RPM"
-    _libflags+=" $_librpm_flags $_libdir_rpm"
+    _libs+=" $_librpm_flags $_libdir_rpm"
     [[ $_enable_rpm == "yes_5" ]] && _cflags+=" -DHAVE_RPM_5"
 }
 
@@ -705,7 +705,8 @@ CC=$_cc
 STRIP=$_strip_cmd
 
 CFLAGS=$_cflags $_incflags
-LDFLAGS=$LDFLAGS $_libflags
+LDFLAGS=$LDFLAGS
+LIBS=$_libs
 DESTDIR ?= $DESTDIR
 RPM_INCFLAGS = $_incdir_rpm
 prefix  ?= $_prefix

@@ -50,7 +50,7 @@ rpmutils.o: rpmutils.c rpmutils.h
 endif
 
 symlookup: $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) $(LDFLAGS) -o symlookup
+	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) ${LIBS} -o symlookup
 	$(STRIP)
 
 install:
@@ -64,7 +64,6 @@ install:
 	install -m 0644 README    $(DESTDIR)$(docdir)/symlookup
 	install -m 0644 TODO      $(DESTDIR)$(docdir)/symlookup
 	install -m 0644 symlookup.1	$(DESTDIR)$(mandir)/man1/symlookup.1
-	gzip --best $(DESTDIR)$(mandir)/man1/symlookup.1
 
 clean:
 	rm -f $(OBJS) $(DEPS)
