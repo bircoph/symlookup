@@ -410,7 +410,7 @@ _incdir_elf=""
 _incdir_rpm="-I/usr/include/rpm"
 _libdir_elf=""
 _libdir_rpm=""
-LDFLAGS+="--Wl,O1"
+LDFLAGS+=" --Wl,O1"
 unset _incflags
 
 #compilation
