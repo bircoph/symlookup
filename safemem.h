@@ -82,7 +82,7 @@ static inline void grow_str(register struct str_t* const arr, register const cha
 }
 
 /* free string array */
-static inline void free_str(register struct str_t *arr)
+static inline void free_str(register const struct str_t *const arr)
 {
     for (unsigned int i=0; i < arr->size; i++)
         free(arr->str[i]);

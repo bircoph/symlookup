@@ -121,7 +121,7 @@ static int check_field_ordinary_dup(const char* const str, const char* const fie
 }
 
 /* find last unset field */
-static enum match_types find_last_field(unsigned int limit)
+static enum match_types find_last_field(const unsigned int limit)
 {
     for (enum match_types i=0; i<limit; i++)
         if (!(field_set & (1U << i)))
