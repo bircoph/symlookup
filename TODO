@@ -1,11 +1,10 @@
-1. ebuild packaging
 1. portage support (via qfile)
 1. add security documentation
 
+2. use regexps on file names 
 2. retrieve additional symbol information (such as symbol@version);
    use GElf_Syminfo *gelf_getsyminfo()
-2. dynamic header width adjustment and column alignment
 2. use obstacks for memory allocation speedup
 
-3. file, symbol and table types selection (is this really needed?)
+3. symbol and table types selection (is this really needed?)
 3. perhaps write russian docs, are they needed?
