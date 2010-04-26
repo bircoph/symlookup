@@ -37,7 +37,7 @@ given symbols are defined and optionally can find rpms provided these
 libraries.
 
 %prep
-%setup -q -n %name
+%setup -q -n %name-%version
 
 %build
 %configure --disable-strip
