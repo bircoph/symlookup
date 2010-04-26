@@ -65,19 +65,19 @@ install:
 	install -m 0644 TODO      $(DESTDIR)$(docdir)/symlookup-$(VERSION)
 	install -m 0644 symlookup.1	$(DESTDIR)$(mandir)/man1/symlookup.1
 
-clean:
-	rm -f $(OBJS) $(DEPS)
-
 tags:
 	ctags $(SRCS) $(HDRS)
+
+clean:
+	rm -f $(OBJS) $(DEPS)
 
 distclean: clean
 	rm -f symlookup config.mak configure.log tags
 
 uninstall:
 	rm -f $(DESTDIR)$(bindir)/symlookup
-	rm -rf $(DESTDIR)$(docdir)/symlookup
-	rm -f $(DESTDIR)$(mandir)/man1/symlookup.1.gz
+	rm -rf $(DESTDIR)$(docdir)/symlookup*
+	rm -f $(DESTDIR)$(mandir)/man1/symlookup.1*
 
 # on distclean per-file deps will be removed anyway
 ifneq ($(MAKECMDGOALS),distclean)
