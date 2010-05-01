@@ -91,11 +91,16 @@ struct sort_t {
     unsigned int match;         //sort independently for different matches
 };
 
+enum verbose_t {
+    V_QUIET,
+    V_NORMAL,
+    V_VERBOSE
+};
+
 /* our options, mask flags above are used; unsigned int is used for speed purposes */
 struct opt_t {
     unsigned int so;    // search for *.so files
     unsigned int ar;    // search for *.ar files
-    unsigned int verb;  // be verbose
     unsigned int dp;    // default search path flag
 #ifdef HAVE_RPM
     unsigned int rpm;   // find rpms
@@ -104,6 +109,7 @@ struct opt_t {
     unsigned int cas;   // ignore case in symbols
     unsigned int tbl;   // use table for results output
     unsigned int hdr;   // print header for the table
+    enum verbose_t verb;// verbosity level
     int re;             // regexp options flag (extended regexps)
     int fts;            // fts() options
     struct sort_t sort; // sort params

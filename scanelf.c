@@ -224,7 +224,7 @@ int checkfile (const char* const filename,
                 elf_end(elf_ar);
             }
         }
-        else if (opt.verb)
+        else if (opt.verb == V_VERBOSE)
             error(0, 0, "%s is not an %s file", fullfilename,
                  (ar && so) ? "so neither an ar" : (so) ? "so" : "ar" );
 

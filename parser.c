@@ -403,7 +403,8 @@ void parse(const int argc, char* const argv[])
         {"table",     0,NULL,'t'},
         {"header",    0,NULL,'H'},
         {"help",      0,NULL,'h'},
-        {"version",   0,NULL,'v'},
+        {"verbose",   0,NULL,'v'},
+        {"version",   0,NULL,'V'},
         {0,0,0,0}
     };
     static int c, opt_ind=0,
@@ -412,9 +413,9 @@ void parse(const int argc, char* const argv[])
     do  /* reading options */
     {
 #ifdef HAVE_RPM
-        c = getopt_long(argc, argv, "p:qaAsdXriRS::tHhv", long_opt, &opt_ind);
+        c = getopt_long(argc, argv, "p:qaAsdXriRS::tHhvV", long_opt, &opt_ind);
 #else
-        c = getopt_long(argc, argv, "p:qaAsdXriS::tHhv", long_opt, &opt_ind);
+        c = getopt_long(argc, argv, "p:qaAsdXriS::tHhvV", long_opt, &opt_ind);
 #endif //HAVE_RPM
         switch (c) {
             case 'h':
@@ -433,7 +434,6 @@ void parse(const int argc, char* const argv[])
             "    -p, --path <PATH1:PATH2:...>    set path(s) for library search,\n"
             "                                    defaults are defined in a way, similar\n"
             "                                    to ld(1) program\n"
-            "    -q, --quiet                     do not show non-fatal errors\n"
             "    -a, --ar                        search also in ar(1) archives\n"
             "    -A, --ar_only                   search ONLY in ar(1) archives\n"
             "    -s, --follow                    follow symbolic links, often it is\n"
@@ -452,8 +452,10 @@ void parse(const int argc, char* const argv[])
             "                                    Sorting below\n"
             "    -t, --table                     use table for results output\n"
             "    -H, --header                    show header for table results output\n"
+            "    -q, --quiet                     show fatal errors only\n"
+            "    -v, --verbose                   be more verbose\n"
             "    -h, --help                      show this help message\n"
-            "    -v, --version                   show version\n"
+            "    -V, --version                   show version\n"
             "Note: -a and -A are mutually exclusive.\n\n"
             "Sorting:\n"
             "    You can collate search results by different fields sequentially.\n"
@@ -483,7 +485,7 @@ void parse(const int argc, char* const argv[])
             "       %i - fts function error\n"
                 ,argv[0], argv[0], argv[0], ERR_PARSE, ERR_IO, ERR_MEM, ERR_ELF, ERR_FTS);
                 exit(0);
-            case 'v':
+            case 'V':
                 puts(
                     "symlookup ver. " VERSION "\n"
                     "license: GNU GPLv.3\n"
@@ -498,7 +500,10 @@ void parse(const int argc, char* const argv[])
                 parse_path_str(optarg);
                 break;
             case 'q':
-                opt.verb = 0;   //not verbose (quiet)
+                opt.verb = V_QUIET;   //not verbose (quiet)
+                break;
+            case 'v':
+                opt.verb = V_VERBOSE; //most verbose
                 break;
             case 'a':
                 opt.ar = 1;

@@ -1,4 +1,5 @@
 1. portage support (via qfile)
+1. opt to change rpm db directory
 1. add security documentation
 1. reorganize man page: split options into different groups, there
    are already many of them.

@@ -73,7 +73,6 @@ struct sym_arr symbol = {
 struct opt_t opt = {
     .so   = 1,
     .ar   = 0,
-    .verb = 1,
     .dp   = 1,
 #ifdef HAVE_RPM
     .rpm  = 0,
@@ -82,6 +81,7 @@ struct opt_t opt = {
     .cas  = 0,
     .tbl  = 0,
     .hdr  = 0,
+    .verb = V_NORMAL,
     .re   = 0,
     .fts  = FTS_PHYSICAL,
     { /* sort */
