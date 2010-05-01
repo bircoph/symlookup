@@ -408,7 +408,8 @@ void parse(const int argc, char* const argv[])
         {0,0,0,0}
     };
     static int c, opt_ind=0,
-               a=0, A=0;            //collision options variables
+               opt_a=0, opt_A=0,    // collision options variables
+               opt_q=0, opt_v=0;    //
 
     do  /* reading options */
     {
@@ -456,7 +457,8 @@ void parse(const int argc, char* const argv[])
             "    -v, --verbose                   be more verbose\n"
             "    -h, --help                      show this help message\n"
             "    -V, --version                   show version\n"
-            "Note: -a and -A are mutually exclusive.\n\n"
+            "Note: if both -a and -A are specified, the last one will take an effect;\n"
+            "      the same is for -q and -v options.\n\n"
             "Sorting:\n"
             "    You can collate search results by different fields sequentially.\n"
             "    Fields must be separated by comma, no spaces are allowed;\n"
@@ -501,18 +503,21 @@ void parse(const int argc, char* const argv[])
                 break;
             case 'q':
                 opt.verb = V_QUIET;   //not verbose (quiet)
+                opt_q = 1;
                 break;
             case 'v':
                 opt.verb = V_VERBOSE; //most verbose
+                opt_v = 1;
                 break;
             case 'a':
                 opt.ar = 1;
-                a = 1;
+                opt.so = 1;
+                opt_a = 1;
                 break;
             case 'A':
                 opt.ar = 1;
                 opt.so = 0;
-                A = 1;
+                opt_A = 1;
                 break;
             case 's':
                 opt.fts &= ~FTS_PHYSICAL;
@@ -561,8 +566,14 @@ void parse(const int argc, char* const argv[])
         }
     }
     while (c!=-1);
-    if (a && A)
-        error(ERR_PARSE, 0, "parse error: -a and -A options are mutually exclusive");
+
+    // check for option collisions
+    if (opt_q && opt_v)
+        error(0, 0, "parse warning: both -q and -v options are specified, "
+                    "the last one will take an effect: -%c", (opt.verb) ? 'v':'q');
+    if (opt.verb && opt_a && opt_A)
+        error(0, 0, "parse warning: both -a and -A options are specified, "
+                    "the last one will take an effect: -%c", (opt.so) ? 'a':'A');
 
     //warn if header is requested but table is not
     if (opt.hdr && !opt.tbl) {
