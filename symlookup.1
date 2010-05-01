@@ -15,7 +15,7 @@
 .\" You should have received a copy of the GNU General Public License version 3
 .\" along with symlookup. If not, see <http://www.gnu.org/licenses/>.
 .\"
-.TH symlookup 1 "24 Apr 2010" "version 0.3.5" "Symbol Lookup Utility"
+.TH symlookup 1 "01 May 2010" "version 0.3.5" "Symbol Lookup Utility"
 .SH NAME
 symlookup \- search for symbols in object files
 .SH SYNOPSIS
@@ -27,18 +27,22 @@ symlookup \- search for symbols in object files
 [-h | --help]
 .br
 .B symlookup
-[-v | --version]
+[-V | --version]
 .br
+.\" ****************************************************************
 .SH DESCRIPTION
 
 .B symlookup
-is an utility intended for object symbols search in dynamic or static
-symbol libraries. It looks up for libraries where given symbols are
-defined and optionally can find rpms provided these libraries.
+is an utility intended for object symbols search in dynamic or
+static symbol libraries. It looks up for libraries where given
+symbols are defined and optionally can find packages holding these
+libraries.
 
-By default search is performed in the standard system paths recursively, 
-in the dynamic libraries only, and omitting symbolic links. But this 
-behaviour may be fully customized by the command line options.
+By default search is performed in the standard system paths
+recursively, looking into dynamic libraries only, and omitting
+symbolic links.
+But program's behaviour may be fully customized by the command line
+options.
 Default system paths are determined in the same way as
 .BR ld (1)
 does. Refer to
@@ -52,43 +56,37 @@ engine for obtained results, see
 .B SORTING
 below.
 
-.BR rpm (1)
-support is optional and may be disabled at compile time if you
-don't need it, e.g. your distribution isn't rpm-based.
-.SH OPTIONS
-
+Optional support for package management systems is present, it is
+configurable at compile time.
+Currently
+.BR rpm (8)
+and
+.BR portage (5)
+are supported.
+Fore more details refer to
+.BR "PACKAGE MANAGEMENT OPTIONS" .
+.\" ****************************************************************
+.SH QUERY OPTIONS
 .TP
 .BR -a ", " --ar
 Search in the
 .BR ar (1)
-archives altogether with shared objects.
-This option is mutually exclusive with
-.BR -A " one."
+archives altogether with shared object libraries.
 .TP
-.BR -A ", " --ar_only
+.BR -A ", " --ar-only
 Search in the
 .BR ar (1)
 archives
 .IR only .
-This option is mutually exclusive with
-.BR -a " one."
 .TP
 .BR -d ", " --xdev
 Stay on the same physical device as search path directory.
-Useful if you don't want to descend into other file systems,
+Useful if you don't want to descend into other file systems
 mounted inside root search directories.
 .TP
-.BR -h ", " --help
-Show help message and exit.
-.TP
-.BR -H ", " --header
-Show header when results are displayed as a table.
-Only valid with
-.B -t
-option.
-.TP
 .BR -i ", " --ignorecase
-Ignore case in symbol names or extended regular expressions.
+Ignore case in symbol names or appropriate extended regular
+expressions.
 .P
 .BR -p ", "
 .BI "--path " <PATH1:PATH2:...>
@@ -98,24 +96,47 @@ not extend them. Each physical file will be analysed once, even
 for overlapped paths or multiple hardlinks.
 .RE
 .TP
-.BR -q ", " --quiet
-Omit non-fatal error messages. This will also skip some 
-non-mandatory sanity checks, thus making program running
-faster but less informative.
-.TP
 .BR -r ", " --repexp
 Treat given symbols as extended regular expressions likewise
-.BR grep (1),
+.BR grep (1)
 instead of search for direct match.
-.TP
-.BR -R ", " --rpm
-Search for rpms provided matched libraries. Only valid if program
-was compiled with rpm support.
 .TP
 .BR -s ", " --follow
 Follow symbolic links instead of omitting them. Be careful: often
-it is just waste of time, because symbolic links usually refer
+this is just waste of time, because symbolic links usually refer
 to the libraries in the same directory.
+.TP
+.BR -X ", " --noext
+Do not perform an extension check for files in question. By default
+".*\\.so\\..*" and ".*\\.so$" patterns are checked against shared
+objects and ".*\\.a$" against ar archives. (If these patterns confuse
+you, look at
+.BR grep (1)
+manual to understand them.)
+.TP
+.I Note:
+if
+.B -a
+and
+.B -A
+options are specified together, the last one will take an effect.
+.\" ****************************************************************
+.SH OUTPUT OPTIONS
+.TP
+.BR -H ", " --header
+Show header when results are displayed as a table.
+Only valid with
+.B -t
+option.
+.TP
+.BR -q ", " --quiet
+Be quiet. Show only fatal error messages with few exceptions. This
+will also skip some non-mandatory sanity checks, thus making
+program running a bit faster but less informative.
+.TP
+.BR -v ", " --verbose
+Be more verbose than by default. This will enable some annoying
+messages.
 .P
 .BR -S ", "
 .BI "--sort " [field,...]
@@ -129,16 +150,27 @@ below.
 .BR -t ", " --table
 Print search results as a table.
 .TP
-.BR -v ", " --version
-Display version information and exit.
+.I Note:
+if
+.B -q
+and
+.B -v
+options are specified together, the last one will take an effect.
+.\" ****************************************************************
+.SH PACKAGE MANAGEMENT OPTIONS
 .TP
-.BR -X ", " --noext
-Do not perform an extension check for files in question. By default
-".*\\.so\\..*" and ".*\\.so$" patterns are checked against shared
-objects and ".*\\.a$" against ar archives. (If these patterns confuse
-you, look at
-.BR grep (1)
-to understand them.)
+.BR -R ", " --rpm
+Search for rpms provided matched libraries. Only valid if program
+was compiled with rpm support.
+.\" ****************************************************************
+.SH GENERAL OPTIONS
+.TP
+.BR -h ", " --help
+Show help message and exit.
+.TP
+.BR -V ", " --version
+Display version information and exit.
+.\" ****************************************************************
 .SH SORTING
 
 .B symlookup
@@ -199,6 +231,7 @@ both dynamic and static libraries installed.
 
 If you'll ever encounter "out of memory" problem, try to
 particularize search pattern or disable sort at all.
+.\" ****************************************************************
 .SH DEFAULT PATHS
 
 Default search paths are detected in the same way as
@@ -228,8 +261,8 @@ included by that file.
 .PP
 Note: each physical file will be analysed once, even for overlapped
 paths or multiple hardlinks.
+.\" ****************************************************************
 .SH EXIT STATUS
-
 .TP
 .B 0
 Normal exit.
@@ -260,16 +293,19 @@ function set error. Further processing is not possible. Usually
 this means problems with root search directory accessing or
 insufficient memory for directory tree structure. See error
 message for details.
+.\" ****************************************************************
 .SH BUGS
 
 Object files > 2GB will be skipped on 32-bit systems. But such
 cases seems to be impractical.
+.\" ****************************************************************
 .SH AUTHOR
 
 .B symlookup
 and this manual was written by Andrew Savchenko
 <bircoph@users.sourceforge.net>, feel free to mail bug reports or
 feature requests to this address.
+.\" ****************************************************************
 .SH SEE ALSO
 
 .BR readelf (1),
@@ -286,8 +322,16 @@ contains an elf file format specification.
 .BR xargs (1)
 are handy utilities for finding files.
 .PP
-.BR rpm (1)
-can be used for examination and manipulation of rpm files.
-.PP
 .BR grep (1)
 contains a description of extended regular expressions syntax.
+.PP
+.BR rpm (8)
+can be used for examination and manipulation of rpm files.
+.PP
+.BR portage (5)
+describes Gentoo portage packaging system.
+.PP
+.BR emerge (1),
+.BR ebuild (1),
+.BR q (1)
+are powerful portage manipulation utilities.

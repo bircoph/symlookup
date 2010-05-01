@@ -390,7 +390,7 @@ void parse(const int argc, char* const argv[])
         {"path",      1,NULL,'p'},
         {"quiet",     0,NULL,'q'},
         {"ar",        0,NULL,'a'},
-        {"ar_only",   0,NULL,'A'},
+        {"ar-only",   0,NULL,'A'},
         {"follow",    0,NULL,'s'},
         {"xdev",      0,NULL,'d'},
         {"noext",     0,NULL,'X'},
@@ -436,7 +436,7 @@ void parse(const int argc, char* const argv[])
             "                                    defaults are defined in a way, similar\n"
             "                                    to ld(1) program\n"
             "    -a, --ar                        search also in ar(1) archives\n"
-            "    -A, --ar_only                   search ONLY in ar(1) archives\n"
+            "    -A, --ar-only                   search ONLY in ar(1) archives\n"
             "    -s, --follow                    follow symbolic links, often it is\n"
             "                                    just wasting of time\n"
             "    -d, --xdev                      stay on the same physical device\n"
