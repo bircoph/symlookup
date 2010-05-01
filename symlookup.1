@@ -15,7 +15,7 @@
 .\" You should have received a copy of the GNU General Public License version 3
 .\" along with symlookup. If not, see <http://www.gnu.org/licenses/>.
 .\"
-.TH symlookup 1 "01 May 2010" "version 0.3.5" "Symbol Lookup Utility"
+.TH symlookup 1 "01 May 2010" "version 0.4.0" "Symbol Lookup Utility"
 .SH NAME
 symlookup \- search for symbols in object files
 .SH SYNOPSIS
@@ -158,15 +158,36 @@ and
 options are specified together, the last one will take an effect.
 .\" ****************************************************************
 .SH PACKAGE MANAGEMENT OPTIONS
+
+.B symlookup
+has optional support for
+.BR rpm (8)
+and
+.BR portage (5)
+package management systems.
+It may be enabled or disabled via configure script.
+Of course, the following options are only valid if program was
+compiled with an appropriate package management support.
+
+.I RPM OPTIONS
 .TP
 .BR -R ", " --rpm
-Search for rpms provided matched libraries. Only valid if program
-was compiled with rpm support.
+Search for rpms owning found libraries.
+.PP
+.RB "An additional " rpm
+search field is available for sort requests.
+See
+.B SORTING
+below.
+
+.I PORTAGE OPTIONS
+.TP
+Portage support is under development now.
 .\" ****************************************************************
 .SH GENERAL OPTIONS
 .TP
 .BR -h ", " --help
-Show help message and exit.
+Show help message, usage information and exit.
 .TP
 .BR -V ", " --version
 Display version information and exit.
@@ -183,9 +204,9 @@ of fields provided. Fields in the list must be separated by comma,
 no spaces, tabs and other delimiters are allowed. If short sort
 option
 .B -S
-is used the list of fields must follow option immediately, without
-any spaces. If long one is used, list must immediately follow
-the '=' sign.
+is used the list of fields must follow the option immediately
+without any spaces. If long one is used, the list must immediately
+follow the '=' sign.
 
 Valid field values are:
 .TP
@@ -201,20 +222,20 @@ sort field if provided.
 Sort by symbol name (case sensitive).
 .TP
 .I file
-Sort by file name, containing matched symbols.
+Sort by file name containing matched symbols.
 .TP
 .I rpm
 Sort by rpm containing matched file; it is useless if
 .B -R
 is unspecified and will be ignored. Option is valid only if program
-compiled with rpm support.
+is compiled with rpm support.
 .P
 .RE
 Default sort sequence is
 .IR file[,rpm],symbol .
-This also affect
+This also affects
 .I match
-sorting. If not all fields will be specified, sane defaults will be
+sorting. If not all fields are specified, sane defaults will be
 used to complete the sequence.
 
 Be aware of memory usage required for sorting. It is directly
@@ -237,7 +258,8 @@ particularize search pattern or disable sort at all.
 Default search paths are detected in the same way as
 .B ld (1)
 utility does this, so program will check all libraries available
-for an ordinary application. The following search paths are used:
+for an ordinary application. The following search paths are used in
+order:
 .TP
 .B 1.
 The contents of "LD_RUN_PATH" environment variable.
@@ -262,15 +284,32 @@ included by that file.
 Note: each physical file will be analysed once, even for overlapped
 paths or multiple hardlinks.
 .\" ****************************************************************
+.SH SECURITY CONSIDERATION
+
+You should 
+.I not
+run
+.B symlookup
+as root.
+Though this program was carefully developed to check all possible
+error conditions and to ensure NULL-terminated strings whenever
+possible, it still uses intensive string I/O and there is no
+guaranty buffer overflow or alike problems will never occur.
+
+For almost all cases execution as a user is sufficient. In rare
+occurrence some system libraries are not world readable. If you
+really want to search inside them, you should copy these libraries
+somewhere and make them user-readable.
+.\" ****************************************************************
 .SH EXIT STATUS
 .TP
 .B 0
 Normal exit.
 .TP
 .B 1
-Parse error. This means that provided option/argument is incorrect
-or conflicting with another one. Error message provides detailed
-information about the reasons of an error.
+Parse error. This means that some of provided options/arguments are
+incorrect. Error message provides detailed information about the
+reasons of an error.
 .TP
 .B 2
 Input/output error. Extern media is broken, perhaps bad hardware,
@@ -280,19 +319,19 @@ pipe, network connection...
 Memory allocation error. Program is running out of memory. Try to
 particularize search pattern or disable results sorting. If the
 last way doesn't help and you have at least some MBs of virtual
-memory available, please report, this may be a bug.
+memory available please report, this may be a bug.
 .TP
 .B 4
 Fatal libelf error. Further processing is not possible. Most
-probably broken libelf library, try to upgrade.
+probably reason is broken libelf library, try to upgrade.
 .TP
 .B 5
 Fatal
 .BR fts (3)
 function set error. Further processing is not possible. Usually
-this means problems with root search directory accessing or
-insufficient memory for directory tree structure. See error
-message for details.
+this means problems with root search directory access or
+insufficient memory for directory tree structure. See error message
+for details.
 .\" ****************************************************************
 .SH BUGS
 

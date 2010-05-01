@@ -1,6 +1,7 @@
 symlookup v0.4.0 Sakura (桜): work is in progress
     * Add additional verbosity level for annoying messages.
-    * Man page was optimized.
+    * Man page is optimized.
+    * --ar_only long option is replaced by --ar-only.
 
 symlookup v0.3.5 Neko (猫): Apr, 26, 2010
     * Project name is changed to more convenient one.
