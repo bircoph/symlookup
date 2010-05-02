@@ -192,6 +192,10 @@ void rpminit()
                             "disabling rpm support.");
         opt.rpm = 0;
     }
+    /* init rpm root if necessary */
+    if (opt.rpmroot)
+        rpmtsSetRootDir(rpm_transaction, opt.rpmroot);
+
     if (opt.verb == V_VERBOSE)
         error(0, 0, "info: rpm api initialized.");
 

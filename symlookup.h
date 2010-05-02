@@ -104,6 +104,7 @@ struct opt_t {
     unsigned int dp;    // default search path flag
 #ifdef HAVE_RPM
     unsigned int rpm;   // find rpms
+    char* rpmroot;      // rpm root directory
 #endif //HAVE_RPM
     unsigned int ext;   // perform extensions check for lib files
     unsigned int cas;   // ignore case in symbols

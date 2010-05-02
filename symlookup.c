@@ -76,6 +76,7 @@ struct opt_t opt = {
     .dp   = 1,
 #ifdef HAVE_RPM
     .rpm  = 0,
+    .rpmroot = NULL,
 #endif //HAVE_RPM
     .ext  = 1,
     .cas  = 0,

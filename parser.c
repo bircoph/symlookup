@@ -387,37 +387,38 @@ static inline void set_default_path()
 void parse(const int argc, char* const argv[])
 {
     static struct option long_opt[]= {
-        {"path",      1,NULL,'p'},
-        {"quiet",     0,NULL,'q'},
-        {"ar",        0,NULL,'a'},
-        {"ar-only",   0,NULL,'A'},
-        {"follow",    0,NULL,'s'},
-        {"xdev",      0,NULL,'d'},
-        {"noext",     0,NULL,'X'},
-        {"regexp",    0,NULL,'r'},
-        {"ignorecase",0,NULL,'i'},
+        {"path",      required_argument,NULL,'p'},
+        {"quiet",     no_argument,      NULL,'q'},
+        {"ar",        no_argument,      NULL,'a'},
+        {"ar-only",   no_argument,      NULL,'A'},
+        {"follow",    no_argument,      NULL,'s'},
+        {"xdev",      no_argument,      NULL,'d'},
+        {"noext",     no_argument,      NULL,'X'},
+        {"regexp",    no_argument,      NULL,'r'},
+        {"ignorecase",no_argument,      NULL,'i'},
 #ifdef HAVE_RPM
-        {"rpm",       0,NULL,'R'},
+        {"rpm",       no_argument,      NULL,'R'},
+        {"rpm-root",  required_argument,NULL,'z'},
 #endif //HAVE_RPM
-        {"sort",      2,NULL,'S'},
-        {"table",     0,NULL,'t'},
-        {"header",    0,NULL,'H'},
-        {"help",      0,NULL,'h'},
-        {"verbose",   0,NULL,'v'},
-        {"version",   0,NULL,'V'},
+        {"sort",      optional_argument,NULL,'S'},
+        {"table",     no_argument,      NULL,'t'},
+        {"header",    no_argument,      NULL,'H'},
+        {"help",      no_argument,      NULL,'h'},
+        {"verbose",   no_argument,      NULL,'v'},
+        {"version",   no_argument,      NULL,'V'},
         {0,0,0,0}
     };
-    static int c, opt_ind=0,
-               opt_a=0, opt_A=0,    // collision options variables
-               opt_q=0, opt_v=0;    //
+    static int c, opt_ind=0;
+    static unsigned int opt_a=0, opt_A=0, // collision options variables
+                        opt_q=0, opt_v=0; //
 
     do  /* reading options */
     {
+        c = getopt_long(argc, argv, "p:aAsdXri"
 #ifdef HAVE_RPM
-        c = getopt_long(argc, argv, "p:qaAsdXriRS::tHhvV", long_opt, &opt_ind);
-#else
-        c = getopt_long(argc, argv, "p:qaAsdXriS::tHhvV", long_opt, &opt_ind);
+                                    "R"
 #endif //HAVE_RPM
+                                    "S::tHqvhV", long_opt, &opt_ind);
         switch (c) {
             case 'h':
                 printf(
@@ -457,6 +458,9 @@ void parse(const int argc, char* const argv[])
             "    -v, --verbose                   be more verbose\n"
             "    -h, --help                      show this help message\n"
             "    -V, --version                   show version\n"
+#ifdef HAVE_RPM
+            "    --rpm-root <PATH>               path to root rpm directory (when chrooting)\n"
+#endif //HAVE_RPM
             "Note: if both -a and -A are specified, the last one will take an effect;\n"
             "      the same is for -q and -v options.\n\n"
             "Sorting:\n"
@@ -547,6 +551,12 @@ void parse(const int argc, char* const argv[])
                 opt.rpm = 1;
                 M_SAVEMEM = M_TYPES;
                 break;
+            case 'z':
+                if (opt.rpmroot)
+                    free (opt.rpmroot);
+                // copy path safely
+                opt.rpmroot = alloc_str(optarg);
+                break;
 #endif //HAVE_RPM
             case 'S':
                 opt.sort.cnt = 1;
@@ -583,10 +593,20 @@ void parse(const int argc, char* const argv[])
     //warn if header is requested but table is not
     if (opt.hdr && !opt.tbl) {
         if (opt.verb)
-            error(0,0,"warning: table header is requested but table output is not\n"
+            error(0,0,"parse warning: table header is requested but table output is not\n"
                       "(-H is specified without -t), ignoring -H option");
         opt.hdr=0;
     }
+
+#ifdef HAVE_RPM
+    if (!opt.rpm && opt.rpmroot)
+    {
+        if (opt.verb)
+            error(0,0,"parse warning: --rpm-root specified, but --rpm is not.\n"
+                      "Ignoring --rpm-root option.");
+        opt.rpmroot = NULL;
+    }
+#endif //HAVE_RPM
 
     //user didn't define search paths
     if (!sp.size)
