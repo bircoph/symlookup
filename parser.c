@@ -492,7 +492,12 @@ void parse(const int argc, char* const argv[])
                     "symlookup ver. " VERSION "\n"
                     "license: GNU GPLv.3\n"
 #ifdef HAVE_RPM
-                    "rpm support: yes"
+                    "rpm support: yes "
+#ifdef HAVE_RPM_5
+                    "(using rpm v5)"
+#else
+                    "(using rpm v4)"
+#endif //HAVE_RPM_5
 #else
                     "rpm support: no"
 #endif //HAVE_RPM
