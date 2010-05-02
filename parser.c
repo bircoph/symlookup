@@ -387,25 +387,29 @@ static inline void set_default_path()
 void parse(const int argc, char* const argv[])
 {
     static struct option long_opt[]= {
-        {"path",      required_argument,NULL,'p'},
-        {"quiet",     no_argument,      NULL,'q'},
-        {"ar",        no_argument,      NULL,'a'},
-        {"ar-only",   no_argument,      NULL,'A'},
-        {"follow",    no_argument,      NULL,'s'},
-        {"xdev",      no_argument,      NULL,'d'},
-        {"noext",     no_argument,      NULL,'X'},
-        {"regexp",    no_argument,      NULL,'r'},
-        {"ignorecase",no_argument,      NULL,'i'},
+        {"path",       required_argument,NULL,'p'},
+        {"quiet",      no_argument,      NULL,'q'},
+        {"ar",         no_argument,      NULL,'a'},
+        {"ar-only",    no_argument,      NULL,'A'},
+        {"follow",     no_argument,      NULL,'s'},
+        {"xdev",       no_argument,      NULL,'d'},
+        {"noext",      no_argument,      NULL,'X'},
+        {"regexp",     no_argument,      NULL,'r'},
+        {"ignorecase", no_argument,      NULL,'i'},
 #ifdef HAVE_RPM
-        {"rpm",       no_argument,      NULL,'R'},
-        {"rpm-root",  required_argument,NULL,'z'},
+        {"rpm",        no_argument,      NULL,'R'},
+        {"rpm-root",   required_argument,NULL,'z'},
 #endif //HAVE_RPM
-        {"sort",      optional_argument,NULL,'S'},
-        {"table",     no_argument,      NULL,'t'},
-        {"header",    no_argument,      NULL,'H'},
-        {"help",      no_argument,      NULL,'h'},
-        {"verbose",   no_argument,      NULL,'v'},
-        {"version",   no_argument,      NULL,'V'},
+#ifdef HAVE_PORTAGE
+        {"ebuild",     no_argument,      NULL,'E'},
+        {"portage-db", required_argument,NULL,'Z'},
+#endif //HAVE_PORTAGE
+        {"sort",       optional_argument,NULL,'S'},
+        {"table",      no_argument,      NULL,'t'},
+        {"header",     no_argument,      NULL,'H'},
+        {"help",       no_argument,      NULL,'h'},
+        {"verbose",    no_argument,      NULL,'v'},
+        {"version",    no_argument,      NULL,'V'},
         {0,0,0,0}
     };
     static int c, opt_ind=0;
@@ -418,6 +422,9 @@ void parse(const int argc, char* const argv[])
 #ifdef HAVE_RPM
                                     "R"
 #endif //HAVE_RPM
+#ifdef HAVE_PORTAGE
+                                    "E"
+#endif //HAVE_PORTAGE
                                     "S::tHqvhV", long_opt, &opt_ind);
         switch (c) {
             case 'h':
@@ -426,11 +433,19 @@ void parse(const int argc, char* const argv[])
             "       %s [-h | --help]\n"
             "       %s [-v | --version]\n\n"
             "Searches for dynamic (by default) or static libs, where given symbols\n"
-#ifdef HAVE_RPM
-            "are defined. Optionally it can find rpms containing these libs.\n"
-#else
-            "are defined.\n"
-#endif //HAVE_RPM
+            "are defined."
+#if (defined(HAVE_RPM) || defined(HAVE_PORTAGE))
+            " Optionally it can find "
+    #if (defined(HAVE_RPM) && defined(HAVE_PORTAGE))
+            "rpms or ebuilds"
+    #elif (defined(HAVE_RPM))
+            "rpms"
+    #else
+            "ebuilds"
+    #endif //(defined(HAVE_RPM) && defined(HAVE_PORTAGE))
+            " containing these libs."
+#endif //(defined(HAVE_RPM) || defined(HAVE_PORTAGE))
+            "\n"
             "If no symbols are defined at command line, standard input is used.\n\n"
             "Options:\n"
             "    -p, --path <PATH1:PATH2:...>    set path(s) for library search,\n"
@@ -449,6 +464,9 @@ void parse(const int argc, char* const argv[])
 #ifdef HAVE_RPM
             "    -R, --rpm                       find rpms, containing target libs\n"
 #endif //HAVE_RPM
+#ifdef HAVE_PORTAGE
+            "    -E, --ebuild                    find ebuilds, containing target libs\n"
+#endif //HAVE_PORTAGE
             "    -S, --sort [field,...]          sort search results; you may arrange\n"
             "                                    collation subsequence order, look at\n"
             "                                    Sorting below\n"
@@ -461,6 +479,9 @@ void parse(const int argc, char* const argv[])
 #ifdef HAVE_RPM
             "    --rpm-root <PATH>               path to root rpm directory (when chrooting)\n"
 #endif //HAVE_RPM
+#ifdef HAVE_PORTAGE
+            "    --portage-db <PATH>             path to portage data base\n"
+#endif //HAVE_PORTAGE
             "Note: if both -a and -A are specified, the last one will take an effect;\n"
             "      the same is for -q and -v options.\n\n"
             "Sorting:\n"
@@ -497,14 +518,19 @@ void parse(const int argc, char* const argv[])
                     "license: GNU GPLv.3\n"
 #ifdef HAVE_RPM
                     "rpm support: yes "
-#ifdef HAVE_RPM_5
-                    "(using rpm v5)"
+    #ifdef HAVE_RPM_5
+                    "(using rpm v5)\n"
+    #else
+                    "(using rpm v4)\n"
+    #endif //HAVE_RPM_5
 #else
-                    "(using rpm v4)"
-#endif //HAVE_RPM_5
-#else
-                    "rpm support: no"
+                    "rpm support: no\n"
 #endif //HAVE_RPM
+#ifdef HAVE_PORTAGE
+                    "portage support: yes"
+#else
+                    "portage support: no"
+#endif //HAVE_PORTAGE
                 );
                 exit(0);
             case 'p':
@@ -549,7 +575,6 @@ void parse(const int argc, char* const argv[])
 #ifdef HAVE_RPM
             case 'R':
                 opt.rpm = 1;
-                M_SAVEMEM = M_TYPES;
                 break;
             case 'z':
                 if (opt.rpmroot)
@@ -558,6 +583,17 @@ void parse(const int argc, char* const argv[])
                 opt.rpmroot = alloc_str(optarg);
                 break;
 #endif //HAVE_RPM
+#ifdef HAVE_PORTAGE
+            case 'E':
+                opt.ebuild = 1;
+                break;
+            case 'Z':
+                if (opt.portageDB)
+                    free (opt.portageDB);
+                // copy path safely
+                opt.portageDB = alloc_str(optarg);
+                break;
+#endif //HAVE_PORTAGE
             case 'S':
                 opt.sort.cnt = 1;
                 if (optarg) {
@@ -599,12 +635,37 @@ void parse(const int argc, char* const argv[])
     }
 
 #ifdef HAVE_RPM
-    if (opt.verb && !opt.rpm && opt.rpmroot)
-        error(0,0,"parse warning: --rpm-root specified, but --rpm is not.\n"
-                  "Ignoring --rpm-root option.");
+    if (!opt.rpm && opt.rpmroot)
+    {
+        if (opt.verb)
+            error(0,0,"parse warning: --rpm-root is specified, but --rpm is not.\n"
+                      "Ignoring --rpm-root option.");
+        free(opt.rpmroot);
+    }
+
+    /* check for M_SAVEMEM */
+    if (opt.rpm)
+        M_SAVEMEM++;
 #endif //HAVE_RPM
 
-    //user didn't define search paths
+#ifdef HAVE_PORTAGE
+    if (!opt.ebuild && opt.portageDB)
+    {
+        if (opt.verb)
+            error(0,0,"parse warning: --portage-db is specified, but --ebuild is not.\n"
+                      "Ignoring --portageDB option.");
+        free(opt.portageDB);
+    }
+    else // user didn't define portage db path
+    if (opt.ebuild && !opt.portageDB)
+        opt.portageDB = alloc_str("/var/db/pkg");
+
+    /* check for M_SAVEMEM */
+    if (opt.ebuild)
+        M_SAVEMEM++;
+#endif //HAVE_PORTAGE
+
+    // user didn't define search paths
     if (!sp.size)
         set_default_path();
     else

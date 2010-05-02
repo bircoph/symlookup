@@ -43,13 +43,17 @@ struct str_t {
 extern struct str_t sp; //all search pathes (string array)
 
 /* number of match types */
-#ifdef HAVE_RPM
-    #define M_TYPES 3
+#if (defined(HAVE_RPM) || defined(HAVE_PORTAGE))
     //allow to reduce match "structure" if rpm search is no used
     extern unsigned int M_SAVEMEM;
+    #if (defined(HAVE_RPM) && defined(HAVE_PORTAGE))
+        #define M_TYPES 4
+    #else
+        #define M_TYPES 3
+    #endif //(defined(HAVE_RPM) && defined(HAVE_PORTAGE))
 #else
     #define M_TYPES 2
-#endif //HAVE_RPM
+#endif //(defined(HAVE_RPM) || defined(HAVE_PORTAGE))
 
 /* match types */
 enum match_types {
@@ -58,6 +62,9 @@ enum match_types {
 #ifdef HAVE_RPM
    ,MATCH_RPM
 #endif //HAVE_RPM
+#ifdef HAVE_PORTAGE
+   ,MATCH_PORTAGE
+#endif //HAVE_PORTAGE
 };
 // printable names for match fields;
 extern const char* const mtypes_str[M_TYPES];
@@ -102,14 +109,18 @@ struct opt_t {
     unsigned int so;    // search for *.so files
     unsigned int ar;    // search for *.ar files
     unsigned int dp;    // default search path flag
-#ifdef HAVE_RPM
-    unsigned int rpm;   // find rpms
-    char* rpmroot;      // rpm root directory
-#endif //HAVE_RPM
     unsigned int ext;   // perform extensions check for lib files
     unsigned int cas;   // ignore case in symbols
     unsigned int tbl;   // use table for results output
     unsigned int hdr;   // print header for the table
+#ifdef HAVE_RPM
+    unsigned int rpm;   // find rpms
+    char* rpmroot;      // rpm root directory
+#endif //HAVE_RPM
+#ifdef HAVE_PORTAGE
+    unsigned int ebuild;// find ebuilds
+    char* portageDB;    // path to portage database
+#endif //HAVE_PORTAGE
     enum verbose_t verb;// verbosity level
     int re;             // regexp options flag (extended regexps)
     int fts;            // fts() options

@@ -74,14 +74,18 @@ struct opt_t opt = {
     .so   = 1,
     .ar   = 0,
     .dp   = 1,
-#ifdef HAVE_RPM
-    .rpm  = 0,
-    .rpmroot = NULL,
-#endif //HAVE_RPM
     .ext  = 1,
     .cas  = 0,
     .tbl  = 0,
     .hdr  = 0,
+#ifdef HAVE_RPM
+    .rpm  = 0,
+    .rpmroot = NULL,
+#endif //HAVE_RPM
+#ifdef HAVE_PORTAGE
+    .ebuild    = 0,
+    .portageDB = NULL,
+#endif //HAVE_PORTAGE
     .verb = V_NORMAL,
     .re   = 0,
     .fts  = FTS_PHYSICAL,
@@ -91,15 +95,22 @@ struct opt_t opt = {
 #ifdef HAVE_RPM
                    ,0
 #endif //HAVE_RPM
+#ifdef HAVE_PORTAGE
+                   ,0
+#endif //HAVE_PORTAGE
                    },
         .match   = 0
     }
 };
-#ifdef HAVE_RPM
+/* decrease M_SAVEMEM by a number of types we can save
+ * in the best case*/
+#if (defined(HAVE_RPM) && defined(HAVE_PORTAGE))
+    unsigned int M_SAVEMEM = M_TYPES - 2;
+#elif (defined(HAVE_RPM) || defined(HAVE_PORTAGE))
     unsigned int M_SAVEMEM = M_TYPES - 1;
 #else
     #define M_SAVEMEM M_TYPES
-#endif //HAVE_RPM
+#endif //(defined(HAVE_RPM) && defined(HAVE_PORTAGE))
 
 /* match field names */
 const char* const mtypes_str[M_TYPES] = {
@@ -108,6 +119,9 @@ const char* const mtypes_str[M_TYPES] = {
 #ifdef HAVE_RPM
     ,"RPM"
 #endif //HAVE_RPM
+#ifdef HAVE_PORTAGE
+    ,"PORTAGE"
+#endif //HAVE_PORTAGE
 };
 
 /* free path array */

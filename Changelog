@@ -4,6 +4,7 @@ symlookup v0.4.0 Sakura (桜): work is in progress
     * CLI API changes: 
       --ar_only long option is replaced by --ar-only;
       -v (--version) changed to -V and -v stands for --verbose.
+    * Option added to specify rpm root directory.
 
 symlookup v0.3.5 Neko (猫): Apr, 26, 2010
     * Project name is changed to more convenient one.
