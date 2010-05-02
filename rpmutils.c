@@ -196,7 +196,7 @@ void rpminit()
     if (opt.rpmroot)
         rpmtsSetRootDir(rpm_transaction, opt.rpmroot);
 
-    if (opt.verb == V_VERBOSE)
+    if (opt.verb >= V_VERBOSE)
         error(0, 0, "info: rpm api initialized.");
 
     //check for rpms without sorting => use storage for 1 rpm match
@@ -211,7 +211,7 @@ void rpminit()
 void rpmuninit()
 {
     rpmtsFree(rpm_transaction);
-    if (opt.verb == V_VERBOSE)
+    if (opt.verb >= V_VERBOSE)
         error(0, 0, "info: rpm database closed.");
 }
 #endif //HAVE_RPM
