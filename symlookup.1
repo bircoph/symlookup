@@ -173,6 +173,13 @@ compiled with an appropriate package management support.
 .TP
 .BR -R ", " --rpm
 Search for rpms owning found libraries.
+.TP
+.BR --rpm-root
+Specify path to rpm root directory.
+Please not, this is not path to rpm database directory, but rather
+to chroot directory holding this database; so this patch will be
+prefixed to /var/lib/rpmdir or whatever is used by rpm on your
+system.
 .PP
 .RB "An additional " rpm
 search field is available for sort requests.
