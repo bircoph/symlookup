@@ -8,6 +8,13 @@ In particular it will be useful in troubleshooting
 This program is distributed under the terms of explicitly
 GNU GPL v.3 license. Please read LICENSE file for details.
 
+In order to be license compatible with Gentoo, the Portage
+part of this project: all files under packaging/portage 
+directory are subjected under *dual* GPL v.2 and GPL v.3 
+licenses. For files inside packaging/portage directory you
+may use either GPL v.2 or GPL v.3 license at your choice.
+The text of GNU GPL v.2 is available at:
+packaging/portage/LICENSE.portage
 _____________
 Requirements:
 ~~~~~~~~~~~~~
