@@ -463,7 +463,7 @@ void parse(const int argc, char* const argv[])
             "    You can collate search results by different fields sequentially.\n"
             "    Fields must be separated by comma, no spaces are allowed;\n"
             "    they must immediately follow short option and long one\n"
-            "    after '=' sign.\n"
+            "    after '=' sign or space.\n"
             "    Valid values are:\n"
             "        match      sort results separately for each symbol (or pattern)\n"
             "                   provided by user; if neither -i nor -r is provided\n"
