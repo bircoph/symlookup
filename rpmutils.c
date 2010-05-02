@@ -194,7 +194,10 @@ void rpminit()
     }
     /* init rpm root if necessary */
     if (opt.rpmroot)
+    {
         rpmtsSetRootDir(rpm_transaction, opt.rpmroot);
+        free(opt.rpmroot); // it is needed no longer
+    }
 
     if (opt.verb >= V_VERBOSE)
         error(0, 0, "info: rpm api initialized.");
