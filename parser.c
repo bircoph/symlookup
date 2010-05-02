@@ -590,7 +590,7 @@ void parse(const int argc, char* const argv[])
         error(0, 0, "parse warning: both -a and -A options are specified, "
                     "the last one will take an effect: -%c", (opt.so) ? 'a':'A');
 
-    //warn if header is requested but table is not
+    // warn if header is requested but table is not
     if (opt.hdr && !opt.tbl) {
         if (opt.verb)
             error(0,0,"parse warning: table header is requested but table output is not\n"
@@ -599,13 +599,9 @@ void parse(const int argc, char* const argv[])
     }
 
 #ifdef HAVE_RPM
-    if (!opt.rpm && opt.rpmroot)
-    {
-        if (opt.verb)
-            error(0,0,"parse warning: --rpm-root specified, but --rpm is not.\n"
-                      "Ignoring --rpm-root option.");
-        opt.rpmroot = NULL;
-    }
+    if (opt.verb && !opt.rpm && opt.rpmroot)
+        error(0,0,"parse warning: --rpm-root specified, but --rpm is not.\n"
+                  "Ignoring --rpm-root option.");
 #endif //HAVE_RPM
 
     //user didn't define search paths
