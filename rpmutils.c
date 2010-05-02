@@ -192,6 +192,8 @@ void rpminit()
                             "disabling rpm support.");
         opt.rpm = 0;
     }
+    if (opt.verb == V_VERBOSE)
+        error(0, 0, "info: rpm api initialized.");
 
     //check for rpms without sorting => use storage for 1 rpm match
     if (opt.rpm && !opt.sort.cnt) {
@@ -205,5 +207,7 @@ void rpminit()
 void rpmuninit()
 {
     rpmtsFree(rpm_transaction);
+    if (opt.verb == V_VERBOSE)
+        error(0, 0, "info: rpm database closed.");
 }
 #endif //HAVE_RPM
