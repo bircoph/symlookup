@@ -28,6 +28,9 @@ SRCS = output.c \
 ifdef HAVE_RPM
 SRCS += rpmutils.c
 endif
+ifdef HAVE_PORTAGE
+SRCS += portageutils.c
+endif
 
 OBJS = $(SRCS:.c=.o)
 DEPS = $(SRCS:.c=.d)

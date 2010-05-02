@@ -40,6 +40,7 @@ External libraries support:
  --disable-rpm      disable rpm support [autodetect]
  --enable-rpm       enable rpm4 support [autodetect]
  --enable-rpm5      enable rpm5 support [autodetect]
+ --disable-portage  disable portage support [autodetect]
  --incdir-elf=DIR   use custom include dir for libelf
  --incdir-rpm=DIR   use custom include dir for librpm
  --libdir-elf=DIR   use custom library dir for libelf
@@ -406,12 +407,15 @@ _mandir_suff="/man"
 
 #libraries (auto|yes|no)
 _enable_rpm="auto"
+_enable_portage="auto"
 _incdir_elf=""
 _incdir_rpm="-I/usr/include/rpm"
 _libdir_elf=""
 _libdir_rpm=""
 LDFLAGS+=" --Wl,O1"
 unset _incflags
+unset _have_rpm
+unset _have_portage
 
 #compilation
 _cc=${CC:="gcc"}
@@ -439,7 +443,6 @@ _strip_flags="-s"
 _debugflags="-ggdb3 -pipe"
 _libelf_flags="-lelf"
 _librpm_flags="-lrpm"
-unset _have_rpm
 
 # parse command line options
 for ((i=1; i<=$#; i++ )); do
@@ -462,6 +465,10 @@ for ((i=1; i<=$#; i++ )); do
         --enable-rpm)  _enable_rpm="yes"
         ;;
         --enable-rpm5) _enable_rpm="yes_5"
+        ;;
+        --disable-portage) _enable_portage="no"
+        ;;
+        --enable-portage)  _enable_portage="yes"
         ;;
         --cc=*)     _cc="$optarg"
         ;;
@@ -685,7 +692,30 @@ fi
     [[ $_enable_rpm == "yes_5" ]] && _cflags+=" -DHAVE_RPM_5"
 }
 
-#remove temporary file
+# portage support
+echocheck "portage"
+if [[ $_enable_portage == "auto" ]]
+then
+    log "Checking for /var/db/pkg..."
+    [[ -d "/var/db/pkg" ]] && {
+        echores "yes"
+        _enable_portage="yes"
+    } || {
+        echores "no"
+        _enable_portage="no"
+    }
+elif [[ $_enable_portage == "yes" ]]
+then
+    echores "yes (forced by user)"
+else
+    echores "no (forced by user)"
+fi
+[[ $_enable_portage == "yes" ]] && {
+    _have_portage="HAVE_PORTAGE = yes"
+    _cflags+=" -DHAVE_PORTAGE"
+}
+
+### remove temporary file
 rm -f $_tmpfile
 
 ### create config.mak
@@ -720,6 +750,7 @@ mandir  ?= $_mandir
 
 VERSION=$_version
 $_have_rpm
+$_have_portage
 EOF
 
 # final message
