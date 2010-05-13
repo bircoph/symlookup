@@ -50,10 +50,11 @@ struct str_t
     sp       = {0, NULL}, //all search pathes (string array)
     file_arr = {0, NULL}; //matched files
 
-/* array for matches ((char*)[3]):
+/* array for matches ((char*)[4]):
    user-provided symbols
    matched files
-   matched rpm */
+   matched rpm
+   matched ebuild */
 
 /* match array */
 struct match_arr_t match_arr = {0, NULL};
@@ -120,7 +121,7 @@ const char* const mtypes_str[M_TYPES] = {
     ,"RPM"
 #endif //HAVE_RPM
 #ifdef HAVE_PORTAGE
-    ,"PORTAGE"
+    ,"EBUILD"
 #endif //HAVE_PORTAGE
 };
 

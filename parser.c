@@ -418,7 +418,7 @@ static inline void construct_sort_sequence()
 #endif //(defined(HAVE_RPM) && defined(HAVE_PORTAGE))
     }
 
-// at the end (opt.sort.cnt == number_of_elements_to_sort)
+    // at the end (opt.sort.cnt == number_of_elements_to_sort)
     opt.sort.cnt = M_SAVEMEM;
 }
 
