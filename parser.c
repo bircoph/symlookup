@@ -178,6 +178,20 @@ static inline void construct_sort_sequence()
                         continue;
                 }
 #endif //HAVE_RPM
+#ifdef HAVE_PORTAGE
+                //rpm special casing
+                if (!strcmp(tail,"ebuild"))
+                {
+                    if (!opt.ebuild)
+                    {
+                        if (opt.verb)
+                            error(0, 0, "parse error: 'ebuild' field is set, but -E is not set, entry ignored");
+                        continue;
+                    }
+                    if (check_field_ordinary_dup(tail, "ebuild", MATCH_EBUILD))
+                        continue;
+                }
+#endif //HAVE_PORTAGE
                 error(ERR_PARSE, 0, "parse error: unknown sort suboption '%s'",tail);
             }
             while ((tail = strtok(NULL, ",")));
@@ -185,28 +199,89 @@ static inline void construct_sort_sequence()
         free(field_list);
     }
 
-    /*****************************
-     * Autocompletion policy:    *
-     * 0: f r s                  *
-     * 1: F r s                  *
-     *    R f s                  *
-     *    S f r                  *
-     * 2: single choise possible *
-     *****************************/
+    /**********************************************************
+     * Autocompletion policy:    ** +RPM, +EBUILD:            *
+     *---------------------------**---------------------------*
+     * -RPM, -EBUILD:            ** 0: f e r s                *
+     *---------------------------**                           *
+     * 0: f s                    ** 1: F e r s                *
+     * 1: single choise possible **    R e f s                *
+     *---------------------------**    E r f s                *
+     * +RPM,-EBUILD/-RPM+EBUILD: **    S f e r                *
+     *---------------------------**                           *
+     * 0: f    r(e) s            ** 2: F E r s                *
+     * 1: F    r(e) s            **    F R e s                *
+     *    R(E) f    s            **    F S e r                *
+     *    S    f    r(e)         **    R E f s                *
+     * 2: single choise possible **    R F e s                *
+     *---------------------------**    R S f e                *
+     * Notes:                     *    E R f s                *
+     * -capital is user field;    *    E F r s                *
+     * -lowcase is autocomletion; *    E S f r                *
+     * -signs:                    *    S F r e                *
+     *   f: file                  *    S R e f                *
+     *   e: ebuild                *    S E r f                *
+     *   r: rpm                   *                           *
+     *   s: symbol                * 3: single choise possible *
+     **********************************************************/
     switch (opt.sort.cnt)
     {
         case 0:
             opt.sort.seq[0]=MATCH_FILE;
+
+#if (defined(HAVE_RPM) && defined(HAVE_PORTAGE))
+            if (opt.rpm && opt.ebuild) {
+                opt.sort.seq[1]=MATCH_EBUILD;
+                opt.sort.seq[2]=MATCH_RPM;
+                opt.sort.seq[3]=MATCH_SYM;
+            }
+            else
+#endif //(defined(HAVE_RPM) && defined(HAVE_PORTAGE))
 #ifdef HAVE_RPM
             if (opt.rpm) {
                 opt.sort.seq[1]=MATCH_RPM;
                 opt.sort.seq[2]=MATCH_SYM;
             }
             else
-#endif //HAVE_RPM
+#endif //HAVE_PORTAGE
+#ifdef HAVE_PORTAGE
+            if (opt.ebuild) {
+                opt.sort.seq[1]=MATCH_EBUILD;
+                opt.sort.seq[2]=MATCH_SYM;
+            }
+            else
+#endif //HAVE_PORTAGE
                 opt.sort.seq[1]=MATCH_SYM;
             break;
+/******************************************************/
         case 1:
+#if (defined(HAVE_RPM) && defined(HAVE_PORTAGE))
+            if (opt.rpm && opt.ebuild)
+                switch (opt.sort.seq[0])
+                {
+                    case MATCH_FILE:
+                        opt.sort.seq[1]=MATCH_EBUILD;
+                        opt.sort.seq[2]=MATCH_RPM;
+                        opt.sort.seq[3]=MATCH_SYM;
+                        break;
+                    case MATCH_RPM:
+                        opt.sort.seq[1]=MATCH_EBUILD;
+                        opt.sort.seq[2]=MATCH_FILE;
+                        opt.sort.seq[3]=MATCH_SYM;
+                        break;
+                    case MATCH_EBUILD:
+                        opt.sort.seq[1]=MATCH_RPM;
+                        opt.sort.seq[2]=MATCH_FILE;
+                        opt.sort.seq[3]=MATCH_SYM;
+                        break;
+                    case MATCH_SYM:
+                        opt.sort.seq[1]=MATCH_FILE;
+                        opt.sort.seq[2]=MATCH_EBUILD;
+                        opt.sort.seq[3]=MATCH_RPM;
+                        break;
+                }
+            else
+#endif //(defined(HAVE_RPM) && defined(HAVE_PORTAGE))
 #ifdef HAVE_RPM
             if (opt.rpm)
                 switch (opt.sort.seq[0])
@@ -223,25 +298,136 @@ static inline void construct_sort_sequence()
                         opt.sort.seq[1]=MATCH_FILE;
                         opt.sort.seq[2]=MATCH_RPM;
                         break;
-            }
+                }
             else
 #endif //HAVE_RPM
+#ifdef HAVE_PORTAGE
+            if (opt.ebuild)
+                switch (opt.sort.seq[0])
+                {
+                    case MATCH_FILE:
+                        opt.sort.seq[1]=MATCH_EBUILD;
+                        opt.sort.seq[2]=MATCH_SYM;
+                        break;
+                    case MATCH_EBUILD:
+                        opt.sort.seq[1]=MATCH_FILE;
+                        opt.sort.seq[2]=MATCH_SYM;
+                        break;
+                    case MATCH_SYM:
+                        opt.sort.seq[1]=MATCH_FILE;
+                        opt.sort.seq[2]=MATCH_EBUILD;
+                        break;
+                }
+            else
+#endif //HAVE_PORTAGE
                 opt.sort.seq[1]=find_last_field(2);
             break;
-#ifdef HAVE_RPM
+/******************************************************/
+#if (defined(HAVE_RPM) || defined(HAVE_PORTAGE))
         case 2:
+    #if (defined(HAVE_RPM) && defined(HAVE_PORTAGE))
+            if (opt.rpm && opt.ebuild) {
+                switch (opt.sort.seq[0])
+                {
+                    case MATCH_FILE:
+                        switch (opt.sort.seq[1])
+                        {
+                            case MATCH_EBUILD:
+                                opt.sort.seq[2]=MATCH_RPM;
+                                opt.sort.seq[3]=MATCH_SYM;
+                                break;
+                            case MATCH_RPM:
+                                opt.sort.seq[2]=MATCH_EBUILD;
+                                opt.sort.seq[3]=MATCH_SYM;
+                                break;
+                            case MATCH_SYM:
+                                opt.sort.seq[2]=MATCH_EBUILD;
+                                opt.sort.seq[3]=MATCH_RPM;
+                                break;
+                        }
+                        break;
+                    case MATCH_RPM:
+                        switch (opt.sort.seq[1])
+                        {
+                            case MATCH_EBUILD:
+                                opt.sort.seq[2]=MATCH_FILE;
+                                opt.sort.seq[3]=MATCH_SYM;
+                                break;
+                            case MATCH_FILE:
+                                opt.sort.seq[2]=MATCH_EBUILD;
+                                opt.sort.seq[3]=MATCH_SYM;
+                                break;
+                            case MATCH_SYM:
+                                opt.sort.seq[2]=MATCH_FILE;
+                                opt.sort.seq[3]=MATCH_EBUILD;
+                                break;
+                        }
+                        break;
+                    case MATCH_EBUILD:
+                        switch (opt.sort.seq[1])
+                        {
+                            case MATCH_RPM:
+                                opt.sort.seq[2]=MATCH_FILE;
+                                opt.sort.seq[3]=MATCH_SYM;
+                                break;
+                            case MATCH_FILE:
+                                opt.sort.seq[2]=MATCH_RPM;
+                                opt.sort.seq[3]=MATCH_SYM;
+                                break;
+                            case MATCH_SYM:
+                                opt.sort.seq[2]=MATCH_FILE;
+                                opt.sort.seq[3]=MATCH_RPM;
+                                break;
+                        }
+                        break;
+                    case MATCH_SYM:
+                        switch (opt.sort.seq[1])
+                        {
+                            case MATCH_FILE:
+                                opt.sort.seq[2]=MATCH_RPM;
+                                opt.sort.seq[3]=MATCH_EBUILD;
+                                break;
+                            case MATCH_RPM:
+                                opt.sort.seq[2]=MATCH_EBUILD;
+                                opt.sort.seq[3]=MATCH_FILE;
+                                break;
+                            case MATCH_EBUILD:
+                                opt.sort.seq[2]=MATCH_RPM;
+                                opt.sort.seq[3]=MATCH_FILE;
+                                break;
+                        }
+                        break;
+                }
+            } //(opt.rpm && opt.ebuild)
+            else
+            if (opt.rpm || opt.ebuild)
+    #elif (defined HAVE_RPM)
             if (opt.rpm)
+    #else
+            if (opt.ebuild)
+#endif //(defined(HAVE_RPM) && defined(HAVE_PORTAGE))
                 opt.sort.seq[2]=find_last_field(3);
             break;
-#endif //HAVE_RPM
+#endif //(defined(HAVE_RPM) || defined(HAVE_PORTAGE))
+/******************************************************/
+#if (defined(HAVE_RPM) && defined(HAVE_PORTAGE))
+        case 3:
+            if (opt.rpm && opt.ebuild)
+                opt.sort.seq[3]=find_last_field(4);
+            break;
+#endif //(defined(HAVE_RPM) && defined(HAVE_PORTAGE))
     }
 
 // at the end (opt.sort.cnt == number_of_elements_to_sort)
-#ifdef HAVE_RPM
+#if (defined(HAVE_RPM) && defined(HAVE_PORTAGE))
+    opt.sort.cnt = M_TYPES-2 + opt.rpm + opt.ebuild;
+#elif (defined(HAVE_RPM))
     opt.sort.cnt = M_TYPES-1 + opt.rpm;
+#elif (defined(HAVE_PORTAGE))
+    opt.sort.cnt = M_TYPES-1 + opt.ebuild;
 #else
     opt.sort.cnt = M_TYPES;
-#endif //HAVE_RPM
+#endif //(defined(HAVE_RPM) && defined(HAVE_PORTAGE))
 }
 
 /****************************************************************
@@ -497,20 +683,20 @@ void parse(const int argc, char* const argv[])
             "        symbol     sort by symbol name (case sensitive)\n"
             "        file       sort by file name\n"
 #ifdef HAVE_RPM
-            "        rpm        sort by rpm containing matched file;\n
-                                it is useless if -R is unspecified.\n"
+            "        rpm        sort by rpm containing matched file;\n"
+            "                   it is useless if -R is unspecified.\n"
 #endif //HAVE_RPM
 #ifdef HAVE_PORTAGE
-            "        ebuild     sort by ebuild containing matched file;\n
-                                it is useless if -E is unspecified.\n"
+            "        ebuild     sort by ebuild containing matched file;\n"
+            "                   it is useless if -E is unspecified.\n"
 #endif //HAVE_PORTAGE
             "    Default sequence is 'file"
-#ifdef HAVE_RPM
-            "(,rpm)"
-#endif //HAVE_RPM
 #ifdef HAVE_PORTAGE
             "(,ebuild)"
 #endif //HAVE_PORTAGE
+#ifdef HAVE_RPM
+            "(,rpm)"
+#endif //HAVE_RPM
             ",symbol'.\n\n"
             "Error codes:\n"
             "       0 - normal exit\n"

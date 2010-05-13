@@ -63,7 +63,7 @@ enum match_types {
    ,MATCH_RPM
 #endif //HAVE_RPM
 #ifdef HAVE_PORTAGE
-   ,MATCH_PORTAGE
+   ,MATCH_EBUILD
 #endif //HAVE_PORTAGE
 };
 // printable names for match fields;
