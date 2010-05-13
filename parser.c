@@ -497,12 +497,21 @@ void parse(const int argc, char* const argv[])
             "        symbol     sort by symbol name (case sensitive)\n"
             "        file       sort by file name\n"
 #ifdef HAVE_RPM
-            "        rpm        sort by rpm containing matched file; it is useless if -R\n"
-            "                   is unspecified.\n"
-            "    Default sequence is 'file(,rpm),symbol'.\n\n"
-#else
-            "    Default sequence is 'file,symbol'.\n\n"
+            "        rpm        sort by rpm containing matched file;\n
+                                it is useless if -R is unspecified.\n"
 #endif //HAVE_RPM
+#ifdef HAVE_PORTAGE
+            "        ebuild     sort by ebuild containing matched file;\n
+                                it is useless if -E is unspecified.\n"
+#endif //HAVE_PORTAGE
+            "    Default sequence is 'file"
+#ifdef HAVE_RPM
+            "(,rpm)"
+#endif //HAVE_RPM
+#ifdef HAVE_PORTAGE
+            "(,ebuild)"
+#endif //HAVE_PORTAGE
+            ",symbol'.\n\n"
             "Error codes:\n"
             "       0 - normal exit\n"
             "       %i - parse error\n"
