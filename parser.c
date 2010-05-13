@@ -419,15 +419,7 @@ static inline void construct_sort_sequence()
     }
 
 // at the end (opt.sort.cnt == number_of_elements_to_sort)
-#if (defined(HAVE_RPM) && defined(HAVE_PORTAGE))
-    opt.sort.cnt = M_TYPES-2 + opt.rpm + opt.ebuild;
-#elif (defined(HAVE_RPM))
-    opt.sort.cnt = M_TYPES-1 + opt.rpm;
-#elif (defined(HAVE_PORTAGE))
-    opt.sort.cnt = M_TYPES-1 + opt.ebuild;
-#else
-    opt.sort.cnt = M_TYPES;
-#endif //(defined(HAVE_RPM) && defined(HAVE_PORTAGE))
+    opt.sort.cnt = M_SAVEMEM;
 }
 
 /****************************************************************
