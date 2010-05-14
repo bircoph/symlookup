@@ -19,12 +19,16 @@
 
 #ifdef HAVE_PORTAGE
 
+#include <search.h>
+#include <errno.h>
+
 #include "portageutils.h"
 #include "symlookup.h"
 
 static inline void
 hash_files(struct str_t *file)
 {
+    hcreate(file->size * 5/4 + 1);
 }
 
 /* builds hash table for files found and searches portage db for them */
