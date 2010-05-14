@@ -428,8 +428,9 @@ int main(const int argc, char *const argv[])
     }
 
 #ifdef HAVE_PORTAGE
+    /* search for ebuilds owning files in questions */
     if (opt.ebuild)
-        find_ebuilds();
+        find_ebuilds(&file_arr);
 #endif //HAVE_PORTAGE
 
     /* sort if required and output results */

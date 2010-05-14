@@ -21,9 +21,10 @@
 #define SL_PORTAGEUTILS_H
 
 #ifdef HAVE_PORTAGE
+#include "symlookup.h"
 
 /* builds hash table for files found and searches portage db for them */
-void find_ebuilds();
+void find_ebuilds(struct str_t *file);
 
 #endif //HAVE_PORTAGE
 

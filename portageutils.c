@@ -19,9 +19,22 @@
 
 #ifdef HAVE_PORTAGE
 
-/* builds hash table for files found and searches portage db for them */
-void find_ebuilds()
+#include "portageutils.h"
+#include "symlookup.h"
+
+static inline void
+hash_files(struct str_t *file)
 {
+}
+
+/* builds hash table for files found and searches portage db for them */
+void find_ebuilds(struct str_t *file)
+{
+    // nothing to do on empty list
+    if (!file->size)
+        return;
+
+    hash_files(file);
 }
 
 #endif //HAVE_PORTAGE
