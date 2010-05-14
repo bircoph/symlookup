@@ -151,7 +151,13 @@ void do_match(const unsigned int i, const char* const filename,
                                     const char* const symbolname)
 {
     //don't sort => print immediately
-    if (!opt.sort.cnt) {
+    if (!opt.sort.cnt)
+#ifdef HAVE_PORTAGE
+    // due to ebuild database structure it is too expensive
+    // to query ebuilds on the fly
+    if (!opt.ebuild)
+#endif //HAVE_PORTAGE
+    {
 #ifdef HAVE_RPM
         if (opt.rpm) //engage rpm support
             listrpm(filename, symbolname, NULL);
