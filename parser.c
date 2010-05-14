@@ -89,7 +89,7 @@ static void grow_sym(const char* const str)
  *         field122 (== e.g., field111)                             *
  * So this is just tab-shifted tree. Duplications in parent leafs   *
  * are possible in general.                                         *
- * 2.2. Terse form. Only valid after MATCH_FILE field.              *
+ * 2.2. Terse form. Only valid after mtype.file field.              *
  * field1                                                           *
  *     field11                                                      *
  *     field12                                                      *
@@ -160,9 +160,9 @@ static inline void construct_sort_sequence()
                     opt.sort.match = 1;
                     continue;
                 }
-                if (check_field_ordinary_dup(tail, "symbol", MATCH_SYM))
+                if (check_field_ordinary_dup(tail, "symbol", mtype.symbol))
                     continue;
-                if (check_field_ordinary_dup(tail, "file", MATCH_FILE))
+                if (check_field_ordinary_dup(tail, "file", mtype.file))
                     continue;
 #ifdef HAVE_RPM
                 //rpm special casing
@@ -174,7 +174,7 @@ static inline void construct_sort_sequence()
                             error(0, 0, "parse error: 'rpm' field is set, but -R is not set, entry ignored");
                         continue;
                     }
-                    if (check_field_ordinary_dup(tail, "rpm", MATCH_RPM))
+                    if (check_field_ordinary_dup(tail, "rpm", mtype.rpm))
                         continue;
                 }
 #endif //HAVE_RPM
@@ -188,7 +188,7 @@ static inline void construct_sort_sequence()
                             error(0, 0, "parse error: 'ebuild' field is set, but -E is not set, entry ignored");
                         continue;
                     }
-                    if (check_field_ordinary_dup(tail, "ebuild", MATCH_EBUILD))
+                    if (check_field_ordinary_dup(tail, "ebuild", mtype.ebuild))
                         continue;
                 }
 #endif //HAVE_PORTAGE
@@ -227,63 +227,63 @@ static inline void construct_sort_sequence()
     switch (opt.sort.cnt)
     {
         case 0:
-            opt.sort.seq[0]=MATCH_FILE;
+            opt.sort.seq[0]=mtype.file;
 
 #if (defined(HAVE_RPM) && defined(HAVE_PORTAGE))
             if (opt.rpm && opt.ebuild) {
-                opt.sort.seq[1]=MATCH_EBUILD;
-                opt.sort.seq[2]=MATCH_RPM;
-                opt.sort.seq[3]=MATCH_SYM;
+                opt.sort.seq[1]=mtype.ebuild;
+                opt.sort.seq[2]=mtype.rpm;
+                opt.sort.seq[3]=mtype.symbol;
             }
             else
 #endif //(defined(HAVE_RPM) && defined(HAVE_PORTAGE))
 #ifdef HAVE_RPM
             if (opt.rpm) {
-                opt.sort.seq[1]=MATCH_RPM;
-                opt.sort.seq[2]=MATCH_SYM;
+                opt.sort.seq[1]=mtype.rpm;
+                opt.sort.seq[2]=mtype.symbol;
             }
             else
 #endif //HAVE_PORTAGE
 #ifdef HAVE_PORTAGE
             if (opt.ebuild) {
-                opt.sort.seq[1]=MATCH_EBUILD;
-                opt.sort.seq[2]=MATCH_SYM;
+                opt.sort.seq[1]=mtype.ebuild;
+                opt.sort.seq[2]=mtype.symbol;
             }
             else
 #endif //HAVE_PORTAGE
-                opt.sort.seq[1]=MATCH_SYM;
+                opt.sort.seq[1]=mtype.symbol;
             break;
 /******************************************************/
         case 1:
 #if (defined(HAVE_RPM) && defined(HAVE_PORTAGE))
             if (opt.rpm && opt.ebuild)
             {
-                if (opt.sort.seq[0] == MATCH_FILE)
+                if (opt.sort.seq[0] == mtype.file)
                 {
-                    opt.sort.seq[1]=MATCH_EBUILD;
-                    opt.sort.seq[2]=MATCH_RPM;
-                    opt.sort.seq[3]=MATCH_SYM;
+                    opt.sort.seq[1]=mtype.ebuild;
+                    opt.sort.seq[2]=mtype.rpm;
+                    opt.sort.seq[3]=mtype.symbol;
                 }
                 else
-                if (opt.sort.seq[0] == MATCH_RPM)
+                if (opt.sort.seq[0] == mtype.rpm)
                 {
-                    opt.sort.seq[1]=MATCH_EBUILD;
-                    opt.sort.seq[2]=MATCH_FILE;
-                    opt.sort.seq[3]=MATCH_SYM;
+                    opt.sort.seq[1]=mtype.ebuild;
+                    opt.sort.seq[2]=mtype.file;
+                    opt.sort.seq[3]=mtype.symbol;
                 }
                 else
-                if (opt.sort.seq[0] == MATCH_EBUILD)
+                if (opt.sort.seq[0] == mtype.ebuild)
                 {
-                    opt.sort.seq[1]=MATCH_RPM;
-                    opt.sort.seq[2]=MATCH_FILE;
-                    opt.sort.seq[3]=MATCH_SYM;
+                    opt.sort.seq[1]=mtype.rpm;
+                    opt.sort.seq[2]=mtype.file;
+                    opt.sort.seq[3]=mtype.symbol;
                 }
                 else
-                if (opt.sort.seq[0] == MATCH_SYM)
+                if (opt.sort.seq[0] == mtype.symbol)
                 {
-                    opt.sort.seq[1]=MATCH_FILE;
-                    opt.sort.seq[2]=MATCH_EBUILD;
-                    opt.sort.seq[3]=MATCH_RPM;
+                    opt.sort.seq[1]=mtype.file;
+                    opt.sort.seq[2]=mtype.ebuild;
+                    opt.sort.seq[3]=mtype.rpm;
                 }
             }
             else
@@ -291,22 +291,22 @@ static inline void construct_sort_sequence()
 #ifdef HAVE_RPM
             if (opt.rpm)
             {
-                if (opt.sort.seq[0] == MATCH_FILE)
+                if (opt.sort.seq[0] == mtype.file)
                 {
-                    opt.sort.seq[1]=MATCH_RPM;
-                    opt.sort.seq[2]=MATCH_SYM;
+                    opt.sort.seq[1]=mtype.rpm;
+                    opt.sort.seq[2]=mtype.symbol;
                 }
                 else
-                if (opt.sort.seq[0] == MATCH_RPM)
+                if (opt.sort.seq[0] == mtype.rpm)
                 {
-                    opt.sort.seq[1]=MATCH_FILE;
-                    opt.sort.seq[2]=MATCH_SYM;
+                    opt.sort.seq[1]=mtype.file;
+                    opt.sort.seq[2]=mtype.symbol;
                 }
                 else
-                if (opt.sort.seq[0] == MATCH_SYM)
+                if (opt.sort.seq[0] == mtype.symbol)
                 {
-                    opt.sort.seq[1]=MATCH_FILE;
-                    opt.sort.seq[2]=MATCH_RPM;
+                    opt.sort.seq[1]=mtype.file;
+                    opt.sort.seq[2]=mtype.rpm;
                 }
             }
             else
@@ -314,22 +314,22 @@ static inline void construct_sort_sequence()
 #ifdef HAVE_PORTAGE
             if (opt.ebuild)
             {
-                if (opt.sort.seq[0] == MATCH_FILE)
+                if (opt.sort.seq[0] == mtype.file)
                 {
-                    opt.sort.seq[1]=MATCH_EBUILD;
-                    opt.sort.seq[2]=MATCH_SYM;
+                    opt.sort.seq[1]=mtype.ebuild;
+                    opt.sort.seq[2]=mtype.symbol;
                 }
                 else
-                if (opt.sort.seq[0] == MATCH_EBUILD)
+                if (opt.sort.seq[0] == mtype.ebuild)
                 {
-                    opt.sort.seq[1]=MATCH_FILE;
-                    opt.sort.seq[2]=MATCH_SYM;
+                    opt.sort.seq[1]=mtype.file;
+                    opt.sort.seq[2]=mtype.symbol;
                 }
                 else
-                if (opt.sort.seq[0] == MATCH_SYM)
+                if (opt.sort.seq[0] == mtype.symbol)
                 {
-                    opt.sort.seq[1]=MATCH_FILE;
-                    opt.sort.seq[2]=MATCH_EBUILD;
+                    opt.sort.seq[1]=mtype.file;
+                    opt.sort.seq[2]=mtype.ebuild;
                 }
             }
             else
@@ -342,87 +342,87 @@ static inline void construct_sort_sequence()
     #if (defined(HAVE_RPM) && defined(HAVE_PORTAGE))
             if (opt.rpm && opt.ebuild)
             {
-                if (opt.sort.seq[0] == MATCH_FILE)
+                if (opt.sort.seq[0] == mtype.file)
                 {
-                    if (opt.sort.seq[1] == MATCH_EBUILD)
+                    if (opt.sort.seq[1] == mtype.ebuild)
                     {
-                        opt.sort.seq[2]=MATCH_RPM;
-                        opt.sort.seq[3]=MATCH_SYM;
+                        opt.sort.seq[2]=mtype.rpm;
+                        opt.sort.seq[3]=mtype.symbol;
                     }
                     else
-                    if (opt.sort.seq[1] == MATCH_RPM)
+                    if (opt.sort.seq[1] == mtype.rpm)
                     {
-                        opt.sort.seq[2]=MATCH_EBUILD;
-                        opt.sort.seq[3]=MATCH_SYM;
+                        opt.sort.seq[2]=mtype.ebuild;
+                        opt.sort.seq[3]=mtype.symbol;
                     }
                     else
-                    if (opt.sort.seq[1] == MATCH_SYM)
+                    if (opt.sort.seq[1] == mtype.symbol)
                     {
-                        opt.sort.seq[2]=MATCH_EBUILD;
-                        opt.sort.seq[3]=MATCH_RPM;
+                        opt.sort.seq[2]=mtype.ebuild;
+                        opt.sort.seq[3]=mtype.rpm;
                     }
                 }
                 else
-                if (opt.sort.seq[0] == MATCH_RPM)
+                if (opt.sort.seq[0] == mtype.rpm)
                 {
-                    if (opt.sort.seq[1] == MATCH_EBUILD)
+                    if (opt.sort.seq[1] == mtype.ebuild)
                     {
-                        opt.sort.seq[2]=MATCH_FILE;
-                        opt.sort.seq[3]=MATCH_SYM;
+                        opt.sort.seq[2]=mtype.file;
+                        opt.sort.seq[3]=mtype.symbol;
                     }
                     else
-                    if (opt.sort.seq[1] == MATCH_FILE)
+                    if (opt.sort.seq[1] == mtype.file)
                     {
-                        opt.sort.seq[2]=MATCH_EBUILD;
-                        opt.sort.seq[3]=MATCH_SYM;
+                        opt.sort.seq[2]=mtype.ebuild;
+                        opt.sort.seq[3]=mtype.symbol;
                     }
                     else
-                    if (opt.sort.seq[1] == MATCH_SYM)
+                    if (opt.sort.seq[1] == mtype.symbol)
                     {
-                        opt.sort.seq[2]=MATCH_FILE;
-                        opt.sort.seq[3]=MATCH_EBUILD;
+                        opt.sort.seq[2]=mtype.file;
+                        opt.sort.seq[3]=mtype.ebuild;
                     }
                 }
                 else
-                if (opt.sort.seq[0] == MATCH_EBUILD)
+                if (opt.sort.seq[0] == mtype.ebuild)
                 {
-                    if (opt.sort.seq[1] == MATCH_RPM)
+                    if (opt.sort.seq[1] == mtype.rpm)
                     {
-                        opt.sort.seq[2]=MATCH_FILE;
-                        opt.sort.seq[3]=MATCH_SYM;
+                        opt.sort.seq[2]=mtype.file;
+                        opt.sort.seq[3]=mtype.symbol;
                     }
                     else
-                    if (opt.sort.seq[1] == MATCH_FILE)
+                    if (opt.sort.seq[1] == mtype.file)
                     {
-                        opt.sort.seq[2]=MATCH_RPM;
-                        opt.sort.seq[3]=MATCH_SYM;
+                        opt.sort.seq[2]=mtype.rpm;
+                        opt.sort.seq[3]=mtype.symbol;
                     }
                     else
-                    if (opt.sort.seq[1] == MATCH_SYM)
+                    if (opt.sort.seq[1] == mtype.symbol)
                     {
-                        opt.sort.seq[2]=MATCH_FILE;
-                        opt.sort.seq[3]=MATCH_RPM;
+                        opt.sort.seq[2]=mtype.file;
+                        opt.sort.seq[3]=mtype.rpm;
                     }
                 }
                 else
-                if (opt.sort.seq[0] == MATCH_SYM)
+                if (opt.sort.seq[0] == mtype.symbol)
                 {
-                    if (opt.sort.seq[1] == MATCH_FILE)
+                    if (opt.sort.seq[1] == mtype.file)
                     {
-                        opt.sort.seq[2]=MATCH_RPM;
-                        opt.sort.seq[3]=MATCH_EBUILD;
+                        opt.sort.seq[2]=mtype.rpm;
+                        opt.sort.seq[3]=mtype.ebuild;
                     }
                     else
-                    if (opt.sort.seq[1] == MATCH_RPM)
+                    if (opt.sort.seq[1] == mtype.rpm)
                     {
-                        opt.sort.seq[2]=MATCH_EBUILD;
-                        opt.sort.seq[3]=MATCH_FILE;
+                        opt.sort.seq[2]=mtype.ebuild;
+                        opt.sort.seq[3]=mtype.file;
                     }
                     else
-                    if (opt.sort.seq[1] == MATCH_EBUILD)
+                    if (opt.sort.seq[1] == mtype.ebuild)
                     {
-                        opt.sort.seq[2]=MATCH_RPM;
-                        opt.sort.seq[3]=MATCH_FILE;
+                        opt.sort.seq[2]=mtype.rpm;
+                        opt.sort.seq[3]=mtype.file;
                     }
                 }
             } //(opt.rpm && opt.ebuild)
@@ -628,15 +628,15 @@ static inline void init_packages()
     /* Initialize type fields */
 #ifdef HAVE_RPM
     if (opt.rpm)
-        MATCH_RPM = 2;
+        mtype.rpm = 2;
 #endif //HAVE_RPM
 #ifdef HAVE_PORTAGE
     #ifdef HAVE_RPM
     if (opt.rpm && opt.ebuild)
-        MATCH_EBUILD = 3;
+        mtype.ebuild = 3;
     else
     #endif //HAVE_RPM
-        MATCH_EBUILD = 2;
+        mtype.ebuild = 2;
 #endif //HAVE_PORTAGE
 }
 #endif //(defined(HAVE_RPM) || defined(HAVE_PORTAGE))
