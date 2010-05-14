@@ -19,4 +19,9 @@
 
 #ifdef HAVE_PORTAGE
 
+/* builds hash table for files found and searches portage db for them */
+void find_ebuilds()
+{
+}
+
 #endif //HAVE_PORTAGE

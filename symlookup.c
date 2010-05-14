@@ -36,6 +36,7 @@
 #include "scanelf.h"
 #include "rpmutils.h"
 #include "output.h"
+#include "portageutils.h"
 
 const size_t reg_error_str_len = 512;
 char *reg_error_str = NULL;
@@ -419,6 +420,11 @@ int main(const int argc, char *const argv[])
         free(reg_error_str);
         free_regstr();
     }
+
+#ifdef HAVE_PORTAGE
+    if (opt.ebuild)
+        find_ebuilds();
+#endif //HAVE_PORTAGE
 
     /* sort if required and output results */
     if (opt.sort.cnt)
