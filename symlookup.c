@@ -110,7 +110,7 @@ struct opt_t opt = {
 #elif (defined(HAVE_RPM) || defined(HAVE_PORTAGE))
     unsigned int M_SAVEMEM = M_TYPES - 1;
 #else
-    #define M_SAVEMEM M_TYPES
+    const unsigned int M_SAVEMEM = M_TYPES;
 #endif //(defined(HAVE_RPM) && defined(HAVE_PORTAGE))
 
 /* match field names */
@@ -227,7 +227,7 @@ void do_match(const unsigned int i, const char* const filename,
             for (unsigned int j = 1; j < rpmname->size; j++) {
                 match_arr.count++;
                 //allocate memory for match data
-                match_arr.match[match_arr.count] = xmalloc(sizeof(char*) * M_TYPES);
+                match_arr.match[match_arr.count] = xmalloc(sizeof(char*) * M_SAVEMEM);
 
                 match_arr.match[match_arr.count][MATCH_SYM]  = match[MATCH_SYM];
                 match_arr.match[match_arr.count][MATCH_FILE] = match[MATCH_FILE];

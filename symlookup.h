@@ -44,16 +44,17 @@ extern struct str_t sp; //all search pathes (string array)
 
 /* number of match types */
 #if (defined(HAVE_RPM) || defined(HAVE_PORTAGE))
-    //allow to reduce match "structure" if rpm search is no used
-    extern unsigned int M_SAVEMEM;
     #if (defined(HAVE_RPM) && defined(HAVE_PORTAGE))
         #define M_TYPES 4
     #else
         #define M_TYPES 3
     #endif //(defined(HAVE_RPM) && defined(HAVE_PORTAGE))
+/* memory to be saved in match structure when non-full query is requested */
+extern unsigned int M_SAVEMEM;
 #else
     #define M_TYPES 2
-#endif //(defined(HAVE_RPM) || defined(HAVE_PORTAGE))
+extern const unsigned int M_SAVEMEM;
+#endif //(defined(HAVE_RPM) && defined(HAVE_PORTAGE))
 
 /* match types */
 enum match_types {
