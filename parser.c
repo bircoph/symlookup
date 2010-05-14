@@ -36,6 +36,8 @@
 #include "parser.h"
 #include "version.h"
 
+extern struct str_t sp; //all search pathes (string array)
+
 /* buffer size for reading lines */
 static size_t line_buf = 512;
 // strtok stuff

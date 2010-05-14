@@ -40,7 +40,6 @@ struct str_t {
     unsigned int size; //number of elements
     char **str;
 };
-extern struct str_t sp; //all search pathes (string array)
 
 /* number of match types */
 #if (defined(HAVE_RPM) || defined(HAVE_PORTAGE))
