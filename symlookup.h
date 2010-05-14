@@ -57,17 +57,17 @@ extern const unsigned int M_SAVEMEM;
 #endif //(defined(HAVE_RPM) && defined(HAVE_PORTAGE))
 
 /* match types */
-extern const unsigned int MATCH_SYM;
-extern const unsigned int MATCH_FILE;
+struct mtype_t {
+    unsigned int symbol;
+    unsigned int file;
 #ifdef HAVE_RPM
-extern unsigned int MATCH_RPM;
+    unsigned int rpm;
 #endif //HAVE_RPM
 #ifdef HAVE_PORTAGE
-extern unsigned int MATCH_EBUILD;
+    unsigned int ebuild;
 #endif //HAVE_PORTAGE
-
-// printable names for match fields;
-extern const char* const mtypes_str[M_TYPES];
+};
+extern struct mtype_t mtype;
 
 /* array for matches ((char*)[3]):
    user-provided symbols

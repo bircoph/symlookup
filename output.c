@@ -29,6 +29,7 @@
 #include "rpmutils.h"
 #include "output.h"
 
+const char* mtypes_str[M_TYPES]; /* match field names */
 const char* const str_not_found = "No matches found.";
 const char* outfmt;
 
@@ -250,6 +251,21 @@ void init_output()
     }
     else
         outfmt = "%s:\t%s\n";
+
+    /* init mtypes_str, required only for headers */
+    if (opt.hdr)
+    {
+        mtypes_str[MATCH_SYM]  = alloc_str("SYMBOL");
+        mtypes_str[MATCH_FILE] = alloc_str("FILE");
+#ifdef HAVE_RPM
+        if (opt.rpm)
+            mtypes_str[MATCH_RPM] = alloc_str("RPM");
+#endif //HAVE_RPM
+#ifdef HAVE_PORTAGE
+        if (opt.ebuild)
+            mtypes_str[MATCH_EBUILD] = alloc_str("EBUILD");
+#endif //HAVE_PORTAGE
+    }
 
     /* show unsorted output header for the first time */
     if (opt.hdr && !opt.sort.cnt)
