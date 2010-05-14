@@ -57,16 +57,15 @@ extern const unsigned int M_SAVEMEM;
 #endif //(defined(HAVE_RPM) && defined(HAVE_PORTAGE))
 
 /* match types */
-enum match_types {
-    MATCH_SYM,
-    MATCH_FILE
+extern const unsigned int MATCH_SYM;
+extern const unsigned int MATCH_FILE;
 #ifdef HAVE_RPM
-   ,MATCH_RPM
+extern unsigned int MATCH_RPM;
 #endif //HAVE_RPM
 #ifdef HAVE_PORTAGE
-   ,MATCH_EBUILD
+extern unsigned int MATCH_EBUILD;
 #endif //HAVE_PORTAGE
-};
+
 // printable names for match fields;
 extern const char* const mtypes_str[M_TYPES];
 

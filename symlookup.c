@@ -113,6 +113,16 @@ struct opt_t opt = {
     const unsigned int M_SAVEMEM = M_TYPES;
 #endif //(defined(HAVE_RPM) && defined(HAVE_PORTAGE))
 
+/* match types */
+const unsigned int MATCH_SYM  = 0;
+const unsigned int MATCH_FILE = 1;
+#ifdef HAVE_RPM
+unsigned int MATCH_RPM;
+#endif //HAVE_RPM
+#ifdef HAVE_PORTAGE
+unsigned int MATCH_EBUILD;
+#endif //HAVE_PORTAGE
+
 /* match field names */
 const char* const mtypes_str[M_TYPES] = {
     "SYMBOL",
