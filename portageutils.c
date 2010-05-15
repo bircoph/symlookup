@@ -38,14 +38,22 @@ hash_init(const size_t size)
         if (opt.verb)
             error(0, errno, "error: cannot init file hash table!\n"
                             "Disabling ebuild support.");
-        // remove ebuild from the sort sequence
-        for (unsigned int i = mtype[M_EBUILD]+1; i<opt.sort.cnt; i++)
-        {
-            //opt.sort.seq[]
-            
-        }
 
+        /* remove ebuild from the sort sequence */
+        unsigned int found = 0;
+        for (unsigned int i = 0; i<opt.sort.cnt; i++)
+        {
+            if (!found)
+            {
+                if (opt.sort.seq[i] == mtype.ebuild)
+                    found=1;
+                continue;
+            }
+            opt.sort.seq[i-1] = opt.sert.seq[i];
+        }
         opt.sort.cnt--;
+        // ebuild is the last type now, so no need to reduce match
+        // type values of other fields
     }
     return ret;
 }
@@ -58,11 +66,10 @@ hash_files(struct str_t *file)
 /* builds hash table for files found and searches portage db for them */
 void find_ebuilds(const struct str_t *const file)
 {
-    // nothing to do on empty list
-    if (!file->size)
+    // nothing to do on empty list or failed hcreate
+    if (!file->size || !hash_init(file->size))
         return;
 
-    hash_init(file->size);
     hash_files(file);
 }
 
