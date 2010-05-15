@@ -20,6 +20,7 @@
 #ifdef HAVE_PORTAGE
 
 #include <search.h>
+#include <error.h>
 #include <errno.h>
 
 #include "portageutils.h"
@@ -27,10 +28,10 @@
 
 // returns 0 on failure, 1 otherwise
 static inline int
-hash_files(const size_t size)
+hash_init(const size_t size)
 {
-    size_t ret;
-    ret = hcreate(file->size * 5/4 + 1);
+    size_t ret = 1;
+    ret = hcreate(size * 5/4 + 1);
 
     if (!ret)
     {
@@ -38,7 +39,7 @@ hash_files(const size_t size)
             error(0, errno, "error: cannot init file hash table!\n"
                             "Disabling ebuild support.");
         // remove ebuild from the sort sequence
-        for (unsigned int i = match.ebuild+1; i<opt.sort.cnt; i++)
+        for (unsigned int i = mtype.ebuild+1; i<opt.sort.cnt; i++)
         {
             //opt.sort.seq[]
             
@@ -46,6 +47,7 @@ hash_files(const size_t size)
 
         opt.sort.cnt--;
     }
+    return ret;
 }
 
 static inline void
