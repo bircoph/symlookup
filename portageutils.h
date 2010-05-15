@@ -24,7 +24,7 @@
 #include "symlookup.h"
 
 /* builds hash table for files found and searches portage db for them */
-void find_ebuilds(struct str_t *file);
+void find_ebuilds(const struct str_t *const file);
 
 #endif //HAVE_PORTAGE
 

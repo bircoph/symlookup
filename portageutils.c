@@ -25,19 +25,42 @@
 #include "portageutils.h"
 #include "symlookup.h"
 
+// returns 0 on failure, 1 otherwise
+static inline int
+hash_files(const size_t size)
+{
+    size_t ret;
+    ret = hcreate(file->size * 5/4 + 1);
+
+    if (!ret)
+    {
+        if (opt.verb)
+            error(0, errno, "error: cannot init file hash table!\n"
+                            "Disabling ebuild support.");
+        // remove ebuild from the sort sequence
+        for (unsigned int i = match.ebuild+1; i<opt.sort.cnt; i++)
+        {
+            //opt.sort.seq[]
+            
+        }
+
+        opt.sort.cnt--;
+    }
+}
+
 static inline void
 hash_files(struct str_t *file)
 {
-    hcreate(file->size * 5/4 + 1);
 }
 
 /* builds hash table for files found and searches portage db for them */
-void find_ebuilds(struct str_t *file)
+void find_ebuilds(const struct str_t *const file)
 {
     // nothing to do on empty list
     if (!file->size)
         return;
 
+    hash_init(file->size);
     hash_files(file);
 }
 
