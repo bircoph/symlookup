@@ -35,6 +35,7 @@
 #include "safemem.h"
 #include "parser.h"
 #include "version.h"
+#include "rpmutils.h"
 
 extern struct str_t sp; //all search pathes (string array)
 
@@ -604,6 +605,11 @@ static inline void init_packages()
                       "Ignoring --rpm-root option.");
         free(opt.rpmroot);
     }
+
+    /* init rpm support,
+     * on failure opt.rpm will become unset */
+    if (opt.rpm)
+        rpminit();
 
     /* check for M_SAVEMEM */
     if (opt.rpm)

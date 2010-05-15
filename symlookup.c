@@ -410,13 +410,9 @@ int main(const int argc, char *const argv[])
     if (elf_version(EV_CURRENT) == EV_NONE)
         error(ERR_ELF, elf_errno(), "fatal: cannot initialize libelf");
 
-#ifdef HAVE_RPM
-    /* init rpm support */
-    if (opt.rpm)
-        rpminit();
-#endif //HAVE_RPM
-
+    /* prepare output */
     init_output();
+
     /* scan file hierarchy */
     fts_scan();
 
