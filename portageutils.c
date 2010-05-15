@@ -49,7 +49,7 @@ hash_init(const size_t size)
                     found=1;
                 continue;
             }
-            opt.sort.seq[i-1] = opt.sert.seq[i];
+            opt.sort.seq[i-1] = opt.sort.seq[i];
         }
         opt.sort.cnt--;
         // ebuild is the last type now, so no need to reduce match
@@ -59,7 +59,7 @@ hash_init(const size_t size)
 }
 
 static inline void
-hash_files(struct str_t *file)
+hash_files(const struct str_t *const file)
 {
 }
 
