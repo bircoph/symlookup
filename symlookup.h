@@ -56,17 +56,17 @@ extern const unsigned int M_SAVEMEM;
 #endif //(defined(HAVE_RPM) && defined(HAVE_PORTAGE))
 
 /* match types */
-enum match_t {
-    M_SYMBOL,
-    M_FILE
+struct mtype_t {
+    unsigned int symbol;
+    unsigned int file;
 #ifdef HAVE_RPM
-    ,M_RPM
+    unsigned int rpm;
 #endif //HAVE_RPM
 #ifdef HAVE_PORTAGE
-    ,M_EBUILD
+    unsigned int ebuild;
 #endif //HAVE_PORTAGE
 };
-extern enum match_t mtype[M_TYPES];
+extern struct mtype_t mtype;
 
 /* array for matches ((char*)[3]):
    user-provided symbols
