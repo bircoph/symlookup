@@ -31,7 +31,7 @@ static inline int
 hash_init(const size_t size)
 {
     size_t ret = 1;
-    ret = hcreate(size * 5/4 + 1);
+    ret = hcreate(size * 4/3 + 1);
 
     if (!ret)
     {
@@ -61,6 +61,14 @@ hash_init(const size_t size)
 static inline void
 hash_files(const struct str_t *const file)
 {
+    ENTRY entry;
+    for (unsigned int i=0; i<file->size; i++)
+    {
+        entry.key = file->str[i];
+        entry.data = (void*)i;
+        // no errors should be here
+        hsearch(entry, ENTER);
+    }
 }
 
 /* builds hash table for files found and searches portage db for them */
