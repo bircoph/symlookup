@@ -114,11 +114,9 @@ struct opt_t opt = {
     const unsigned int M_SAVEMEM = M_TYPES;
 #endif //(defined(HAVE_RPM) && defined(HAVE_PORTAGE))
 
-/* match types */
-struct mtype_t mtype = {
-    .symbol = 0,
-    .file = 1
-};
+/* match types
+ * constantly define symbol and file */
+enum match_t mtype[M_TYPES] = {0,1};
 
 /* free path array */
 static inline void free_unused()
@@ -177,13 +175,13 @@ void do_match(const unsigned int i, const char* const filename,
     match = match_arr.match[match_arr.count];
 
     if (opt.re || opt.cas)
-        match[mtype.symbol] = alloc_str(symbolname);
+        match[mtype[M_SYMBOL]] = alloc_str(symbolname);
     else
         // In the case of exact, case insensitive match
         // we do not need to allocate new string, since
         // matched symbolname is by definition equal to
         // the user-requested symbol string.
-        match[mtype.symbol] = symbol.str[i];
+        match[mtype[M_SYMBOL]] = symbol.str[i];
 
     /* It is possible to save some memory for multiple
        single file matches by means of small memory overhead
@@ -208,7 +206,7 @@ void do_match(const unsigned int i, const char* const filename,
 #endif //HAVE_RPM
     }
 
-    match[mtype.file] = file_arr.str[file_arr.size-1];
+    match[mtype[M_FILE]] = file_arr.str[file_arr.size-1];
 
 #ifdef HAVE_RPM
     static char *const str_rpmnf = "<rpm not found>";
@@ -216,7 +214,7 @@ void do_match(const unsigned int i, const char* const filename,
         static struct str_t *rpmname;
         rpmname = &rpm_arr[file_arr.size-1];
         //str_rpmnf <=> no match message
-        match[mtype.rpm] = (rpmname->size)? rpmname->str[0] : str_rpmnf;
+        match[mtype[M_RPM]] = (rpmname->size)? rpmname->str[0] : str_rpmnf;
 
         /* unroll several rpm matches to independent match results,
            so configurable sort can be done easly */
@@ -230,9 +228,9 @@ void do_match(const unsigned int i, const char* const filename,
                 //allocate memory for match data
                 match_arr.match[match_arr.count] = xmalloc(sizeof(char*) * M_SAVEMEM);
 
-                match_arr.match[match_arr.count][mtype.symbol]  = match[mtype.symbol];
-                match_arr.match[match_arr.count][mtype.file] = match[mtype.file];
-                match_arr.match[match_arr.count][mtype.rpm]  = rpmname->str[j];
+                match_arr.match[match_arr.count][mtype[M_SYMBOL]]  = match[mtype[M_SYMBOL]];
+                match_arr.match[match_arr.count][mtype[M_FILE]] = match[mtype[M_FILE]];
+                match_arr.match[match_arr.count][mtype[M_RPM]]  = rpmname->str[j];
             }
         }
     }

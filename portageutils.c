@@ -39,7 +39,7 @@ hash_init(const size_t size)
             error(0, errno, "error: cannot init file hash table!\n"
                             "Disabling ebuild support.");
         // remove ebuild from the sort sequence
-        for (unsigned int i = mtype.ebuild+1; i<opt.sort.cnt; i++)
+        for (unsigned int i = mtype[M_EBUILD]+1; i<opt.sort.cnt; i++)
         {
             //opt.sort.seq[]
             

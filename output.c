@@ -48,7 +48,7 @@ static void construct_header()
 
 /* Comparison function for ordinary matches.
    It must be called only if ordinary sort is enabled (opt.sort.cnt),
-   opt.sort.seq must NOT contain mtype.rpm if (!opt.rpm) */
+   opt.sort.seq must NOT contain mtype[M_RPM] if (!opt.rpm) */
 static int compare_matches(const void* const a, const void* const b)
 {
     // statically initialize to shut up gcc
@@ -70,7 +70,7 @@ static int compare_matches(const void* const a, const void* const b)
 
 /* Comparison function for matches within fixed level.
    It must be called only from terse output subsystem,
-   opt.sort.seq must NOT contain mtype.rpm if (!opt.rpm).
+   opt.sort.seq must NOT contain mtype[M_RPM] if (!opt.rpm).
    External variable comparision_level is used to denote level to compare,
    as it can't be passed to the function directly */
 unsigned int comparision_level;
@@ -198,7 +198,7 @@ static void print_result(char*** const match, const unsigned int count,
             prev_str[j] = str; // save current string
 
             /* terse output section */
-            if (type[j] == mtype.file && j < opt.sort.cnt - 1)
+            if (type[j] == mtype[M_FILE] && j < opt.sort.cnt - 1)
             {
                 i = terse_output(match, count, i, j+1);
                 break;
@@ -255,15 +255,15 @@ void init_output()
     /* init mtypes_str, required only for headers */
     if (opt.hdr)
     {
-        mtypes_str[mtype.symbol]  = alloc_str("SYMBOL");
-        mtypes_str[mtype.file] = alloc_str("FILE");
+        mtypes_str[mtype[M_SYMBOL]]  = alloc_str("SYMBOL");
+        mtypes_str[mtype[M_FILE]] = alloc_str("FILE");
 #ifdef HAVE_RPM
         if (opt.rpm)
-            mtypes_str[mtype.rpm] = alloc_str("RPM");
+            mtypes_str[mtype[M_RPM]] = alloc_str("RPM");
 #endif //HAVE_RPM
 #ifdef HAVE_PORTAGE
         if (opt.ebuild)
-            mtypes_str[mtype.ebuild] = alloc_str("EBUILD");
+            mtypes_str[mtype[M_EBUILD]] = alloc_str("EBUILD");
 #endif //HAVE_PORTAGE
     }
 
@@ -272,12 +272,12 @@ void init_output()
     {
 #ifdef HAVE_RPM
         if (opt.rpm)
-            printf(outfmt, mtypes_str[mtype.file], 
-                    mtypes_str[mtype.rpm], mtypes_str[mtype.symbol]);
+            printf(outfmt, mtypes_str[mtype[M_FILE]], 
+                    mtypes_str[mtype[M_RPM]], mtypes_str[mtype[M_SYMBOL]]);
         else
 #endif //HAVE_RPM
-            printf(outfmt, mtypes_str[mtype.file], 
-                    mtypes_str[mtype.symbol]);
+            printf(outfmt, mtypes_str[mtype[M_FILE]], 
+                    mtypes_str[mtype[M_SYMBOL]]);
     }
 }
 
