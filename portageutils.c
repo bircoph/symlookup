@@ -26,41 +26,46 @@
 #include "portageutils.h"
 #include "symlookup.h"
 
-// returns 0 on failure, 1 otherwise
-static inline int
-hash_init(const size_t size)
+/* disables ebuild support */
+static void ebulid_disable(void)
 {
-    size_t ret = 1;
-    ret = hcreate(size * 4/3 + 1);
+    /* remove ebuild from the sort sequence */
+    unsigned int found = 0;
+    for (unsigned int i = 0; i<opt.sort.cnt; i++)
+    {
+        if (!found)
+        {
+            if (opt.sort.seq[i] == mtype.ebuild)
+                found=1;
+            continue;
+        }
+        opt.sort.seq[i-1] = opt.sort.seq[i];
+    }
+    opt.sort.cnt--;
+    // ebuild is the last type now, so no need to reduce match
+    // type values of other fields
+}
 
-    if (!ret)
+/* builds hash table for files found and searches portage db for them */
+void find_ebuilds(const struct str_t *const file)
+{
+    // nothing to do on empty list
+    if (!file->size)
+        return;
+
+    /* initialize hash */
+    if (!hcreate(file->size * 4/3 + 1))
     {
         if (opt.verb)
             error(0, errno, "error: cannot init file hash table!\n"
                             "Disabling ebuild support.");
-
-        /* remove ebuild from the sort sequence */
-        unsigned int found = 0;
-        for (unsigned int i = 0; i<opt.sort.cnt; i++)
-        {
-            if (!found)
-            {
-                if (opt.sort.seq[i] == mtype.ebuild)
-                    found=1;
-                continue;
-            }
-            opt.sort.seq[i-1] = opt.sort.seq[i];
-        }
-        opt.sort.cnt--;
-        // ebuild is the last type now, so no need to reduce match
-        // type values of other fields
+        ebuild_disable();
+        return;
     }
-    return ret;
-}
 
-static inline void
-hash_files(const struct str_t *const file)
-{
+
+
+    /* hash found files */
     ENTRY entry;
     for (unsigned int i=0; i<file->size; i++)
     {
@@ -69,16 +74,6 @@ hash_files(const struct str_t *const file)
         // no errors should be here
         hsearch(entry, ENTER);
     }
-}
-
-/* builds hash table for files found and searches portage db for them */
-void find_ebuilds(const struct str_t *const file)
-{
-    // nothing to do on empty list or failed hcreate
-    if (!file->size || !hash_init(file->size))
-        return;
-
-    hash_files(file);
 }
 
 #endif //HAVE_PORTAGE
