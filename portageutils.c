@@ -22,12 +22,19 @@
 #include <search.h>
 #include <error.h>
 #include <errno.h>
+#include <dirent.h>
+#include <unistd.h>
+#include <fcntl.h>
 
 #include "portageutils.h"
 #include "symlookup.h"
+#include "safemem.h"
+
+#define CONTENTS_NAME "/CONTENTS"
+#define CONTENTS_LEN  10
 
 /* disables ebuild support */
-static void ebulid_disable(void)
+static void ebuild_disable(void)
 {
     /* remove ebuild from the sort sequence */
     unsigned int found = 0;
@@ -44,6 +51,16 @@ static void ebulid_disable(void)
     opt.sort.cnt--;
     // ebuild is the last type now, so no need to reduce match
     // type values of other fields
+}
+
+/* Selects only categories which are directories
+ * and do not begin with '.' */
+static int filter_directory(const struct dirent *dir)
+{
+    if (dir->d_type == DT_DIR && dir->d_name[0] != '.')
+        return 1;
+    else
+        return 0;
 }
 
 /* builds hash table for files found and searches portage db for them */
@@ -63,7 +80,20 @@ void find_ebuilds(const struct str_t *const file)
         return;
     }
 
+    /* initialize portage root DB dir entry */
+    struct dirent **category;
+    int categories;
 
+    /* open portage root DB dir */
+    categories = scandir(opt.portageDB, &category, filter_directory, 0);
+    if (categories == -1 || chdir(opt.portageDB) == -1)
+    {
+        if (opt.verb)
+            error(0, errno, "error: cannot open portage root directory %s\n"
+                            "Disabling ebuild support.", opt.portageDB);
+        ebuild_disable();
+        return;
+    }
 
     /* hash found files */
     ENTRY entry;
@@ -74,6 +104,68 @@ void find_ebuilds(const struct str_t *const file)
         // no errors should be here
         hsearch(entry, ENTER);
     }
+
+    /* portage DB tree loop data declarations */
+    struct dirent **package;   // for packages in each category
+    int    packages,           // number of packages in category
+           list;               // file descriptor for listing file
+    char  *contents,           // full name of CONTENTS file
+          *tmpstr;             // temporary pointer for string operations
+    size_t contents_len = 128, // max pool for length of CONTENTS full file name
+           new_len,            // length of new CONTENTS file name
+           category_len,       // category name length
+           package_len;        // package name length
+
+    contents = xmalloc(contents_len);
+
+    /* loop through portage categories */
+    for (int i=0; i<categories; i++)
+    {
+        packages = scandir(category[i]->d_name, &package, filter_directory, 0);
+        if (packages == -1)
+        {
+            if (opt.verb)
+                error(0, errno, "error: cannot open portage category %s\n",
+                         category[i]->d_name);
+            continue;
+        }
+
+        category_len = _D_EXACT_NAMLEN(category[i]);
+
+        /* loop through packages/CONTENTS */
+        for (int j=0; j<packages; j++)
+        {
+            package_len = _D_EXACT_NAMLEN(package[j]);
+            // new len + len("/CONTENTS") + '\0'
+            new_len = category_len + package_len + CONTENTS_LEN;
+            if (new_len > contents_len)
+                contents = xrealloc(contents, contents_len * 2);
+
+            // construct file name
+            memcpy(contents, category[i]->d_name, category_len);
+            tmpstr = contents + category_len;
+            memcpy(tmpstr, package[j]->d_name, package_len);
+            tmpstr += package_len;
+            memcpy(tmpstr, CONTENTS_NAME, CONTENTS_LEN);
+            tmpstr[CONTENTS_LEN] = '\0';
+
+            /* open file */
+            list = open(contents, O_NOATIME, O_RDONLY);
+
+            // clean memory
+            free(package[j]);
+        }
+
+
+        // clean memory
+        free(category[i]);
+        free(package);
+    }
+
+    // clean memory
+    hdestroy();
+    free(contents);
+    free(category);
 }
 
 #endif //HAVE_PORTAGE
