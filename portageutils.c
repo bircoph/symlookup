@@ -74,7 +74,7 @@ void find_ebuilds(const struct str_t *const file)
     if (!hcreate(file->size * 4/3 + 1))
     {
         if (opt.verb)
-            error(0, errno, "error: cannot init file hash table!\n"
+            error(0, errno, "error: cannot init file hash table! "
                             "Disabling ebuild support.");
         ebuild_disable();
         return;
@@ -89,7 +89,7 @@ void find_ebuilds(const struct str_t *const file)
     if (categories == -1 || chdir(opt.portageDB) == -1)
     {
         if (opt.verb)
-            error(0, errno, "error: cannot open portage root directory %s\n"
+            error(0, errno, "error: cannot open portage root directory %s. "
                             "Disabling ebuild support.", opt.portageDB);
         ebuild_disable();
         return;
@@ -115,6 +115,7 @@ void find_ebuilds(const struct str_t *const file)
            new_len,            // length of new CONTENTS file name
            category_len,       // category name length
            package_len;        // package name length
+    struct stat list_stat;     // to fstat() listing file
 
     contents = xmalloc(contents_len);
 
@@ -125,7 +126,7 @@ void find_ebuilds(const struct str_t *const file)
         if (packages == -1)
         {
             if (opt.verb)
-                error(0, errno, "error: cannot open portage category %s\n",
+                error(0, errno, "error: cannot open portage category %s.",
                          category[i]->d_name);
             continue;
         }
@@ -147,10 +148,30 @@ void find_ebuilds(const struct str_t *const file)
             memcpy(tmpstr, package[j]->d_name, package_len);
             tmpstr += package_len;
             memcpy(tmpstr, CONTENTS_NAME, CONTENTS_LEN);
-            tmpstr[CONTENTS_LEN] = '\0';
 
             /* open file */
             list = open(contents, O_NOATIME, O_RDONLY);
+            if (list != -1)
+            {
+                // stat to obtain size
+                if (!fstat(list, &list_stat))
+                {
+                    /* mmap now */
+
+                }
+                else
+                {
+                    if (opt.verb)
+                        error(0, errno, "error: can't stat file %s, "
+                                        "check your portage DB!", contents);
+                }
+            }
+            else
+            {
+                if (opt.verb)
+                    error(0, errno, "error: can't open file %s for reading, "
+                                    "check your portage DB!", contents);
+            }
 
             // clean memory
             free(package[j]);
