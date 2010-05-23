@@ -25,6 +25,7 @@
 #include <dirent.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <sys/mman.h>
 
 #include "portageutils.h"
 #include "symlookup.h"
@@ -61,6 +62,13 @@ static int filter_directory(const struct dirent *const dir)
         return 1;
     else
         return 0;
+}
+
+/* Process mmaped file */
+static inline int
+process_list(const char *const mbuf,
+             const char *const package_name,  const size_t package_len)
+{
 }
 
 /* builds hash table for files found and searches portage db for them */
@@ -113,15 +121,18 @@ void find_ebuilds(const struct str_t *const file)
 
     /***** portage DB tree loop data declarations *****/
     struct dirent **package;   // for packages in each category
-    int    packages,           // number of packages in category
-           list;               // file descriptor for listing file
+    int    packages;           // number of packages in category
+
     char  *contents,           // full name of CONTENTS file
           *tmpstr;             // temporary pointer for string operations
     size_t contents_len = 128, // max pool for length of CONTENTS full file name
            new_len,            // length of new CONTENTS file name
            category_len,       // category name length
            package_len;        // package name length
+
+    int    list;               // file descriptor for listing file
     struct stat list_stat;     // to fstat() listing file
+    char  *mbuf;               // mmap buffer
 
     contents = xmalloc(contents_len);
 
@@ -143,34 +154,59 @@ void find_ebuilds(const struct str_t *const file)
             for (int j=0; j<packages; j++)
             {
                 package_len = _D_EXACT_NAMLEN(package[j]);
-                // new len + len("/CONTENTS") + '\0'
-                new_len = category_len + package_len + CONTENTS_LEN;
+                // new len = category + '/' + package + "/CONTENTS" + '\0'
+                new_len = category_len + 1 + package_len + CONTENTS_LEN;
                 if (new_len > contents_len)
                     contents = xrealloc(contents, contents_len * 2);
 
                 // construct file name
                 memcpy(contents, category[i]->d_name, category_len);
                 tmpstr = contents + category_len;
+                *tmpstr++ = '/';
                 memcpy(tmpstr, package[j]->d_name, package_len);
                 tmpstr += package_len;
                 memcpy(tmpstr, CONTENTS_NAME, CONTENTS_LEN);
 
                 /* open file */
-                list = open(contents, O_NOATIME, O_RDONLY);
+                list = open(contents, 0, O_RDONLY);
                 if (list != -1)
                 {
                     // stat to obtain size
-                    if (!fstat(list, &list_stat))
-                    {
-                        /* mmap now */
-
-                    }
-                    else
+                    if (fstat(list, &list_stat))
                     {
                         if (opt.verb)
                             error(0, errno, "error: can't stat file %s, "
                                             "check your portage DB!", contents);
                     }
+                    else
+                    {
+                        // zero size is normal for at least virtual packages
+                        if (list_stat.st_size > 0)
+                        {
+                            /* mmap now */
+                            mbuf = mmap(NULL, list_stat.st_size, PROT_READ,
+                                        MAP_PRIVATE | MAP_POPULATE | MAP_NORESERVE,
+                                        list, 0);
+                            if (mmap == MAP_FAILED)
+                            {
+                                if (opt.verb)
+                                    error(0, errno, "error: can't mmap file %s %li bytes long!",
+                                             contents, list_stat.st_size);
+                            }
+                            else
+                            {
+                                // process CONTENTS file
+                                process_list(mbuf, contents, category_len + 1 + package_len);
+                                if (munmap(mbuf, list_stat.st_size) && opt.verb)
+                                    error(0, errno, "warning: can't unmap file %s %li bytes long!",
+                                             contents, list_stat.st_size);
+                            }
+
+                        }
+                    }
+                    // check if file is closed correctly
+                    if (close(list) && opt.verb)
+                            error(0, errno, "warning: can't close file %s", contents);
                 }
                 else
                 {
