@@ -55,7 +55,7 @@ static void ebuild_disable(void)
 
 /* Selects only categories which are directories
  * and do not begin with '.' */
-static int filter_directory(const struct dirent *dir)
+static int filter_directory(const struct dirent *const dir)
 {
     if (dir->d_type == DT_DIR && dir->d_name[0] != '.')
         return 1;
@@ -92,6 +92,12 @@ void find_ebuilds(const struct str_t *const file)
             error(0, errno, "error: cannot open portage root directory %s. "
                             "Disabling ebuild support.", opt.portageDB);
         ebuild_disable();
+        // additional cleanups an this stage
+        if (categories >= 0)
+            for (int i=0; i<categories; i++)
+                free(category[i]);
+        free(category);
+        hdestroy();
         return;
     }
 
@@ -105,7 +111,7 @@ void find_ebuilds(const struct str_t *const file)
         hsearch(entry, ENTER);
     }
 
-    /* portage DB tree loop data declarations */
+    /***** portage DB tree loop data declarations *****/
     struct dirent **package;   // for packages in each category
     int    packages,           // number of packages in category
            list;               // file descriptor for listing file
@@ -128,65 +134,65 @@ void find_ebuilds(const struct str_t *const file)
             if (opt.verb)
                 error(0, errno, "error: cannot open portage category %s.",
                          category[i]->d_name);
-            continue;
         }
-
-        category_len = _D_EXACT_NAMLEN(category[i]);
-
-        /* loop through packages/CONTENTS */
-        for (int j=0; j<packages; j++)
+        else
         {
-            package_len = _D_EXACT_NAMLEN(package[j]);
-            // new len + len("/CONTENTS") + '\0'
-            new_len = category_len + package_len + CONTENTS_LEN;
-            if (new_len > contents_len)
-                contents = xrealloc(contents, contents_len * 2);
+            category_len = _D_EXACT_NAMLEN(category[i]);
 
-            // construct file name
-            memcpy(contents, category[i]->d_name, category_len);
-            tmpstr = contents + category_len;
-            memcpy(tmpstr, package[j]->d_name, package_len);
-            tmpstr += package_len;
-            memcpy(tmpstr, CONTENTS_NAME, CONTENTS_LEN);
-
-            /* open file */
-            list = open(contents, O_NOATIME, O_RDONLY);
-            if (list != -1)
+            /* loop through packages/CONTENTS */
+            for (int j=0; j<packages; j++)
             {
-                // stat to obtain size
-                if (!fstat(list, &list_stat))
-                {
-                    /* mmap now */
+                package_len = _D_EXACT_NAMLEN(package[j]);
+                // new len + len("/CONTENTS") + '\0'
+                new_len = category_len + package_len + CONTENTS_LEN;
+                if (new_len > contents_len)
+                    contents = xrealloc(contents, contents_len * 2);
 
+                // construct file name
+                memcpy(contents, category[i]->d_name, category_len);
+                tmpstr = contents + category_len;
+                memcpy(tmpstr, package[j]->d_name, package_len);
+                tmpstr += package_len;
+                memcpy(tmpstr, CONTENTS_NAME, CONTENTS_LEN);
+
+                /* open file */
+                list = open(contents, O_NOATIME, O_RDONLY);
+                if (list != -1)
+                {
+                    // stat to obtain size
+                    if (!fstat(list, &list_stat))
+                    {
+                        /* mmap now */
+
+                    }
+                    else
+                    {
+                        if (opt.verb)
+                            error(0, errno, "error: can't stat file %s, "
+                                            "check your portage DB!", contents);
+                    }
                 }
                 else
                 {
                     if (opt.verb)
-                        error(0, errno, "error: can't stat file %s, "
+                        error(0, errno, "error: can't open file %s for reading, "
                                         "check your portage DB!", contents);
                 }
-            }
-            else
-            {
-                if (opt.verb)
-                    error(0, errno, "error: can't open file %s for reading, "
-                                    "check your portage DB!", contents);
-            }
 
+                // clean memory
+                free(package[j]);
+            }
             // clean memory
-            free(package[j]);
+            free(package);
         }
-
-
         // clean memory
         free(category[i]);
-        free(package);
     }
 
     // clean memory
-    hdestroy();
     free(contents);
     free(category);
+    hdestroy();
 }
 
 #endif //HAVE_PORTAGE
