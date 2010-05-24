@@ -32,7 +32,7 @@
 #include "safemem.h"
 
 #define CONTENTS_NAME "/CONTENTS"
-#define CONTENTS_LEN  10
+#define CONTENTS_LEN  10 // len + '\0'
 
 /* disables ebuild support */
 static void ebuild_disable(void)
@@ -65,9 +65,9 @@ static int filter_directory(const struct dirent *const dir)
 }
 
 /* Process mmaped file */
-static inline int
-process_list(const char *const mbuf,
-             const char *const package_name,  const size_t package_len)
+static inline void
+process_list(const char *const mbuf, const off_t mbuf_len,
+             const char *const package_name, const size_t package_len)
 {
 }
 
@@ -196,7 +196,8 @@ void find_ebuilds(const struct str_t *const file)
                             else
                             {
                                 // process CONTENTS file
-                                process_list(mbuf, contents, category_len + 1 + package_len);
+                                process_list(mbuf, list_stat.st_size, 
+                                             contents, category_len + 1 + package_len);
                                 if (munmap(mbuf, list_stat.st_size) && opt.verb)
                                     error(0, errno, "warning: can't unmap file %s %li bytes long!",
                                              contents, list_stat.st_size);
