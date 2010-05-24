@@ -102,9 +102,11 @@ void find_ebuilds(const struct str_t *const file)
         ebuild_disable();
         // additional cleanups an this stage
         if (categories >= 0)
+        {
             for (int i=0; i<categories; i++)
                 free(category[i]);
-        free(category);
+            free(category);
+        }
         hdestroy();
         return;
     }
