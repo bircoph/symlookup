@@ -26,6 +26,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/mman.h>
+#include <stdio.h>
 
 #include "portageutils.h"
 #include "symlookup.h"
@@ -120,6 +121,9 @@ void find_ebuilds(const struct str_t *const file)
         // no errors should be here
         hsearch(entry, ENTER);
     }
+
+    if (opt.verb == V_VERBOSE)
+        puts("--> Searching portage database");
 
     /***** portage DB tree loop data declarations *****/
     struct dirent **package;   // for packages in each category
