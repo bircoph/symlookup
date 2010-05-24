@@ -113,7 +113,7 @@ void find_ebuilds(const struct str_t *const file)
 
     /* hash found files */
     ENTRY entry;
-    for (unsigned int i=0; i<file->size; i++)
+    for (unsigned long int i=0; i<file->size; i++)
     {
         entry.key = file->str[i];
         entry.data = (void*)i;
