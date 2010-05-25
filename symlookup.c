@@ -130,7 +130,13 @@ static inline void free_unused()
 
     /* we don't need rpm storage anymore if
        we do not use sorting */
-    if (opt.rpm && !opt.sort.cnt) {
+    if (opt.rpm && !opt.sort.cnt
+#ifdef HAVE_PORTAGE
+            // do not free rpm array if ebuild search is engaged,
+            // because immediate output is not possible in this case
+            && !opt.ebuild
+#endif //HAVE_PORTAGE
+            ) {
         free_str(rpm_arr);
         free(rpm_arr);
     }

@@ -23,6 +23,8 @@
 #ifdef HAVE_PORTAGE
 #include "symlookup.h"
 
+extern struct str_t *ebuild_arr;
+
 /* builds hash table for files found and searches portage db for them */
 void find_ebuilds(const struct str_t *const file);
 

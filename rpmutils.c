@@ -41,7 +41,7 @@
 /* rpm vars */
 rpmts rpm_transaction;  //rpm transaction set
 char *prevfile = NULL;
-struct str_t *rpm_arr;  //matched rpms (conforms with filearr)
+struct str_t *rpm_arr;  //matched rpms (conforms with file_arr)
 
 /* extract full rpm name from header
    memory is to be freed outside */

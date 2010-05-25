@@ -27,6 +27,7 @@
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "portageutils.h"
 #include "symlookup.h"
@@ -34,6 +35,10 @@
 
 #define CONTENTS_NAME "/CONTENTS"
 #define CONTENTS_LEN  10 // len + '\0'
+
+/* 2D array of ebuilds corresponding to file_arr */
+struct str_t *ebuild_arr;
+extern struct str_t file_arr;
 
 /* disables ebuild support */
 static void ebuild_disable(void)
@@ -121,6 +126,11 @@ void find_ebuilds(const struct str_t *const file)
         // no errors should be here
         hsearch(entry, ENTER);
     }
+
+    /* Initialize array for found ebuilds */
+    size_t len_earr = file_arr.size * sizeof(struct str_t);
+    ebuild_arr = xmalloc(len_earr);
+    memset(ebuild_arr, 0, len_earr);
 
     if (opt.verb == V_VERBOSE)
         puts("--> Searching portage database");
