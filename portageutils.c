@@ -117,9 +117,6 @@ process_list(char *ptr, const char *const mbuf_end,
         ebuild->str[ebuild->size] = xmalloc(package_len + 1);
         memcpy(ebuild->str[ebuild->size], package_name, package_len);
         ebuild->str[ebuild->size][package_len] = '\0';
-
-        puts(ebuild->str[ebuild->size]);
-
         // grow ebuild array
         ebuild->size++;
     }
