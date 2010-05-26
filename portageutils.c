@@ -70,11 +70,59 @@ static int filter_directory(const struct dirent *const dir)
         return 0;
 }
 
-/* Process mmaped file */
+/* Process mmaped file.
+ * Store "category/package" if file is found in the hash table.
+ * ptr -- mmap start;
+ * mbuf_end -- mmap end + 1;
+ * package_name -- "category/package" without trailing '\0';
+ * package_len -- length of "category/package" */
 static inline void
-process_list(const char *const mbuf, const off_t mbuf_len,
+process_list(char *ptr, const char *const mbuf_end,
              const char *const package_name, const size_t package_len)
 {
+    char *begin;
+    ENTRY request, *result;
+    struct str_t *ebuild;  // current element of ebuild array
+
+    for (; ptr < mbuf_end; ptr++)
+    {
+        begin = ptr;
+        // search for end of line
+        for (; ptr < mbuf_end; ptr++)
+            if (*ptr == '\n')
+                break;
+
+        /* minimum length for valid string of interest is 49:
+         * "obj X 617ae644c40ec045954426e0702d936e 1260230791"
+         * 3:1:name:1:32:1:10\n */
+
+        // continue on bad length or header
+        if (ptr-begin < 49 || strncmp(begin,"obj",3))
+            continue;
+
+        // denote end of file name
+        *(ptr-44) = '\0';
+
+        /* check match */
+        request.key = begin+4;
+        result = hsearch(request, FIND);
+        if (!result)
+            continue;
+
+        /* add ebuild to ebuilds array by index corresponding to file array */
+        ebuild = &ebuild_arr[(unsigned long)(result->data)];
+        // grow ebuild array
+        ebuild->str = xrealloc(ebuild->str, sizeof(char*) * (ebuild->size + 1));
+        // allocate and fill new string
+        ebuild->str[ebuild->size] = xmalloc(package_len + 1);
+        memcpy(ebuild->str[ebuild->size], package_name, package_len);
+        ebuild->str[ebuild->size][package_len] = '\0';
+
+        puts(ebuild->str[ebuild->size]);
+
+        // grow ebuild array
+        ebuild->size++;
+    }
 }
 
 /* builds hash table for files found and searches portage db for them */
@@ -200,9 +248,8 @@ void find_ebuilds(const struct str_t *const file)
                         if (list_stat.st_size > 0)
                         {
                             /* mmap now */
-                            mbuf = mmap(NULL, list_stat.st_size, PROT_READ,
-                                        MAP_PRIVATE | MAP_POPULATE | MAP_NORESERVE,
-                                        list, 0);
+                            mbuf = mmap(NULL, list_stat.st_size, PROT_READ | PROT_WRITE,
+                                        MAP_PRIVATE | MAP_POPULATE, list, 0);
                             if (mmap == MAP_FAILED)
                             {
                                 if (opt.verb)
@@ -212,7 +259,7 @@ void find_ebuilds(const struct str_t *const file)
                             else
                             {
                                 // process CONTENTS file
-                                process_list(mbuf, list_stat.st_size, 
+                                process_list(mbuf, mbuf + list_stat.st_size, 
                                              contents, category_len + 1 + package_len);
                                 if (munmap(mbuf, list_stat.st_size) && opt.verb)
                                     error(0, errno, "warning: can't unmap file %s %li bytes long!",
