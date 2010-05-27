@@ -956,6 +956,9 @@ void parse(const int argc, char* const argv[])
             flags = REG_EXTENDED | REG_NOSUB;
         if (filename_case)
             flags |= REG_ICASE;
+
+        // allocate regexp
+        opt.file_re = xmalloc(sizeof(regex_t));
         //compile regexp
         if (( err_code = regcomp(opt.file_re, filename_regexp, flags) ))
         {

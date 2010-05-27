@@ -154,8 +154,10 @@ static inline void free_unused()
             free(symbol.regstr);
         }
         else
-        if (opt.file_re)
+        if (opt.file_re) {
             regfree(opt.file_re);
+            free(opt.file_re);
+        }
     }
 }
 
