@@ -209,6 +209,13 @@ search field is available for sort requests.
 See
 .B SORTING
 below.
+.TP
+.I Note:
+Immediate output of unsorted results is not possible for ebuild
+queries because portage data base implementation is highly
+inefficient for ownership queries.
+All matched files will be queried at once and results will be
+output in the very end of program execution.
 .\" ****************************************************************
 .SH GENERAL OPTIONS
 .TP
