@@ -114,25 +114,26 @@ void listrpm(const char *const filename, const char *const symbolname,
 
     static char *list;
     static const char* const str_no_match = "<no matches>";
+    static const char* const format = "\t%s\t%s\t%s\n";
     if (!rpm_arr->size)
         //table output is different a bit
         if (opt.tbl)
-            if (!opt.sort.match)
-                printf(outfmt, filename, str_no_match, symbolname);
-            else
-                printf(outfmt, pattern, filename, str_no_match, symbolname);
+        {
+            if (opt.sort.match)
+                fputs(pattern, stdout);
+            printf(format, filename, str_no_match, symbolname);
+        }
         else
             list = alloc_str(str_no_match);
     else {
         //new raw in table for each entry
         if (opt.tbl)
-            if (!opt.sort.match)
-                for (unsigned int i=0; i < rpm_arr->size; i++)
-                    printf(outfmt, filename, rpm_arr->str[i], symbolname);
-            else
-                for (unsigned int i=0; i < rpm_arr->size; i++)
-                    printf(outfmt, pattern, filename, rpm_arr->str[i], symbolname);
-
+            for (unsigned int i=0; i < rpm_arr->size; i++)
+            {
+                if (opt.sort.match)
+                    fputs(pattern, stdout);
+                printf(format, filename, rpm_arr->str[i], symbolname);
+            }
         else
         {
             list = alloc_str(rpm_arr->str[0]);

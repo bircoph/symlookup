@@ -169,7 +169,13 @@ void do_match(const unsigned int i, const char* const filename,
             listrpm(filename, symbolname, NULL);
         else
 #endif //HAVE_RPM
-            printf(outfmt, filename, symbolname);
+        {
+            fputs(filename, stdout);
+            if (!opt.tbl)
+                putchar(':');
+            putchar('\t');
+            puts(symbolname);
+        }
         matches_found = 1;
         return;
     }
@@ -441,7 +447,13 @@ int main(const int argc, char *const argv[])
     /* sort if required and output results */
     if (opt.sort.cnt)
         sort_output();
-    else if (opt.verb && !matches_found)
+#ifdef HAVE_PORTAGE
+    else // special case for unsorted ebuild output as it can't be done in do_match()
+    if (opt.ebuild)
+        ebuild_unsorted_output();
+#endif //HAVE_PORTAGE
+    else
+    if (opt.verb && !matches_found)
         puts(str_not_found);
 
 #ifdef HAVE_RPM

@@ -21,11 +21,12 @@
 #define SL_OUTPUT_H
 
 extern const char* const str_not_found;
-// predefinable output format for unsorted output
-extern const char* outfmt;
 
 /* sort if required and output results */
 void sort_output();
+
+/* output unsorted results for ebuild search */
+void ebuild_unsorted_output();
 
 /* initialize output (header, formats) */
 void init_output();

@@ -31,7 +31,6 @@
 
 const char* mtypes_str[M_TYPES]; /* match field names */
 const char* const str_not_found = "No matches found.";
-const char* outfmt;
 
 /* create header for sorted output */
 static void construct_header()
@@ -237,24 +236,14 @@ void sort_output()
         print_result(match_arr.match, match_arr.count, NULL);
 }
 
+/* output unsorted results for ebuild search */
+void ebuild_unsorted_output()
+{
+}
+
+/* initialize output (header, formats) */
 void init_output()
 {
-    /* setup output format,
-       useful only for non-sorted data, including match */
-    if (opt.tbl) {
-#ifdef HAVE_RPM
-        if (opt.rpm)
-            if (opt.sort.match)
-                outfmt = "%s\t%s\t%s\t%s\n";
-            else
-                outfmt = "%s\t%s\t%s\n";
-        else
-#endif //HAVE_RPM
-            outfmt = "%s\t%s\n";
-    }
-    else
-        outfmt = "%s:\t%s\n";
-
     /* init mtypes_str, required only for headers */
     if (opt.hdr)
     {
@@ -273,14 +262,22 @@ void init_output()
     /* show unsorted output header for the first time */
     if (opt.hdr && !opt.sort.cnt)
     {
+        // output as: file [ebuild] [rpm] symbol
+        fputs(mtypes_str[mtype.file], stdout);
+        putchar('\t');
+#ifdef HAVE_PORTAGE
+        if (opt.ebuild) {
+            fputs(mtypes_str[mtype.ebuild], stdout);
+            putchar('\t');
+        }
+#endif //HAVE_PORTAGE
 #ifdef HAVE_RPM
-        if (opt.rpm)
-            printf(outfmt, mtypes_str[mtype.file], 
-                    mtypes_str[mtype.rpm], mtypes_str[mtype.symbol]);
-        else
+        if (opt.rpm) {
+            fputs(mtypes_str[mtype.rpm], stdout);
+            putchar('\t');
+        }
 #endif //HAVE_RPM
-            printf(outfmt, mtypes_str[mtype.file], 
-                    mtypes_str[mtype.symbol]);
+        puts(mtypes_str[mtype.symbol]);
     }
 }
 
