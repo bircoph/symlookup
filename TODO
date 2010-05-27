@@ -1,4 +1,3 @@
-1. use regexps on file names 
 1. retrieve additional symbol information (such as symbol@version);
    use GElf_Syminfo *gelf_getsyminfo()
 1. use obstacks for memory allocation speedup

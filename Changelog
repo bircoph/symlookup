@@ -4,6 +4,8 @@ symlookup v0.4.0 Sakura (桜): work is in progress
       - support for multiple ownership;
       - fast DB queries using mmap;
       - portage DB directory is configurable.
+    * Extended regular expression may be used to limit libraries
+      file names.
     * Add additional verbosity level for annoying messages.
     * Man page is optimized.
     * CLI API changes: 

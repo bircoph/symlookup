@@ -84,9 +84,21 @@ Stay on the same physical device as search path directory.
 Useful if you don't want to descend into other file systems
 mounted inside root search directories.
 .TP
+.BR -F ", " --filename-repexp
+Limit library file names by specified extended regular expression.
+See 
+.BR grep (1)
+for syntax details.
+Leading directory name is not affected by this filter.
+.TP
 .BR -i ", " --ignorecase
 Ignore case in symbol names or appropriate extended regular
 expressions.
+.TP
+.BR -I ", " --filename-ignorecase
+Ignore case in file name extended regular expression.
+This option is useless without
+.BR -F .
 .P
 .BR -p ", "
 .BI "--path " <PATH1:PATH2:...>
