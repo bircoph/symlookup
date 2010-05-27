@@ -189,7 +189,7 @@ void rpminit()
         if (opt.verb)
             error(0, errno, "error: cannot init rpm transaction set!\n"
                             "rpm database is probably absent or broken,\n"
-                            "disabling rpm support.");
+                            "disabling rpm support");
         opt.rpm = 0;
     }
     /* init rpm root if necessary */

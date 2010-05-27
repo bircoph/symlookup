@@ -117,7 +117,7 @@ struct opt_t {
     char* rpmroot;      // rpm root directory
 #endif //HAVE_RPM
 #ifdef HAVE_PORTAGE
-    unsigned int ebuild;// find ebuilds
+    unsigned int ebuild;// find ebuilds (2 stands for disabled due to init error)
     char* portageDB;    // path to portage database
 #endif //HAVE_PORTAGE
     enum verbose_t verb;// verbosity level

@@ -236,7 +236,9 @@ void sort_output()
         print_result(match_arr.match, match_arr.count, NULL);
 }
 
-/* output unsorted results for ebuild search */
+/* Output unsorted results for ebuild search,
+ * take care of special case when ebuild was enabled by user,
+ * but disabled later due to an error. */
 #ifdef HAVE_PORTAGE
 void ebuild_unsorted_output()
 {
@@ -251,15 +253,40 @@ void ebuild_unsorted_output()
 
     for (unsigned int i=0; i < match_arr.count; i++)
     {
-        printf("%s (ebuild: %s", match_arr.match[i][mtype.file],
-                                 match_arr.match[i][mtype.ebuild]);
+        fputs(match_arr.match[i][mtype.file], stdout);
+
+        if (opt.ebuild == 1
 #ifdef HAVE_RPM
+            || opt.rpm    
+#endif //HAVE_RPM
+                )
+            fputs(" (", stdout);
+
+        if (opt.ebuild == 1) {
+            fputs("ebuild: ", stdout);
+            fputs(match_arr.match[i][mtype.ebuild], stdout);
+        }
+
+#ifdef HAVE_RPM
+        if (opt.ebuild == 1
+            && opt.rpm    
+                )
+            fputs(", ", stdout);
+
         if (opt.rpm) {
-            fputs(", rpm:", stdout);
+            fputs("rpm: ", stdout);
             fputs(match_arr.match[i][mtype.rpm], stdout);
         }
 #endif //HAVE_RPM
-        fputs("): ", stdout);
+
+        if (opt.ebuild == 1
+#ifdef HAVE_RPM
+            || opt.rpm    
+#endif //HAVE_RPM
+                )
+            putchar(')');
+
+        fputs(": ", stdout);
         puts(match_arr.match[i][mtype.symbol]);
     }
 }

@@ -58,7 +58,7 @@ static void ebuild_disable(void)
     }
     if (opt.sort.cnt)
         opt.sort.cnt--;
-    opt.ebuild = 0;
+    opt.ebuild = 2;
     // ebuild is the last type now, so no need to reduce match
     // type values of other fields
 }
