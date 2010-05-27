@@ -56,7 +56,8 @@ static void ebuild_disable(void)
         }
         opt.sort.seq[i-1] = opt.sort.seq[i];
     }
-    opt.sort.cnt--;
+    if (opt.sort.cnt)
+        opt.sort.cnt--;
     opt.ebuild = 0;
     // ebuild is the last type now, so no need to reduce match
     // type values of other fields
