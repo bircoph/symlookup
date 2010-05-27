@@ -1,9 +1,7 @@
-1. portage support
-
-2. use regexps on file names 
-2. retrieve additional symbol information (such as symbol@version);
+1. use regexps on file names 
+1. retrieve additional symbol information (such as symbol@version);
    use GElf_Syminfo *gelf_getsyminfo()
-2. use obstacks for memory allocation speedup
+1. use obstacks for memory allocation speedup
 
-3. symbol and table types selection (is this really needed?)
-3. perhaps write russian docs, are they needed?
+2. symbol and table types selection (is this really needed?)
+2. perhaps write russian docs, are they needed?

@@ -1,4 +1,9 @@
 symlookup v0.4.0 Sakura (桜): work is in progress
+    * Portage support:
+      - ebuilds query;
+      - support for multiple ownership;
+      - fast DB queries using mmap;
+      - portage DB directory is configurable.
     * Add additional verbosity level for annoying messages.
     * Man page is optimized.
     * CLI API changes: 

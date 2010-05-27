@@ -15,7 +15,7 @@
 .\" You should have received a copy of the GNU General Public License version 3
 .\" along with symlookup. If not, see <http://www.gnu.org/licenses/>.
 .\"
-.TH symlookup 1 "01 May 2010" "version 0.4.0" "Symbol Lookup Utility"
+.TH symlookup 1 "27 May 2010" "version 0.4.0" "Symbol Lookup Utility"
 .SH NAME
 symlookup \- search for symbols in object files
 .SH SYNOPSIS
@@ -166,6 +166,8 @@ and
 .BR portage (5)
 package management systems.
 It may be enabled or disabled via configure script.
+It is OK to use several package management systems at once (thought
+that kind of setup is rare).
 Of course, the following options are only valid if program was
 compiled with an appropriate package management support.
 
@@ -194,7 +196,19 @@ does, so you can attune its behaviour via rpm config files as well.
 
 .I PORTAGE OPTIONS
 .TP
-Portage support is under development now.
+.BR -E ", " --ebuild
+Search for ebuilds owning found libraries.
+.TP
+.BR --portage-db
+Specify path to portage database root directory.
+Usually this is /var/db/pkg, but may differ on chroot or similar
+conditions.
+.PP
+.RB "An additional " ebuild
+search field is available for sort requests.
+See
+.B SORTING
+below.
 .\" ****************************************************************
 .SH GENERAL OPTIONS
 .TP
@@ -236,15 +250,21 @@ Sort by symbol name (case sensitive).
 .I file
 Sort by file name containing matched symbols.
 .TP
+.I ebuild
+Sort by ebuild owning matched file; it is useless if
+.B -E
+is unspecified and will be ignored. Option is valid only if program
+is compiled with ebuild support.
+.TP
 .I rpm
-Sort by rpm containing matched file; it is useless if
+Sort by rpm owning matched file; it is useless if
 .B -R
 is unspecified and will be ignored. Option is valid only if program
 is compiled with rpm support.
 .P
 .RE
 Default sort sequence is
-.IR file[,rpm],symbol .
+.IR file[,ebuild][,rpm],symbol .
 This also affects
 .I match
 sorting. If not all fields are specified, sane defaults will be
@@ -307,6 +327,8 @@ Though this program was carefully developed to check all possible
 error conditions and to ensure NULL-terminated strings whenever
 possible, it still uses intensive string I/O and there is no
 guaranty buffer overflow or alike problems will never occur.
+Aside from that this program use external libraries which may have
+their own security issues.
 
 For almost all cases execution as a user is sufficient. In rare
 occurrence some system libraries are not world readable. If you
