@@ -131,7 +131,7 @@ process_list(char *ptr, const char *const mbuf_end,
 static void fill_ebuild(const unsigned int match_idx, const unsigned int ebuild_idx)
 {
     static char **match;
-    static struct str_t *ebuild;
+    static const struct str_t *ebuild;
     match = match_arr.match[match_idx];
     ebuild = &ebuild_arr[ebuild_idx];
 
@@ -349,14 +349,22 @@ void find_ebuilds(const struct str_t *const file)
 
     /* Fill ebuild field in match array.
      * Take advantage of sequential file filling in match array */
-    char **match;         // pointer to current match data
     unsigned int idx = 0; // index in ebuild and file arrays
+    // remember current end of match array, it may grow further due
+    // to several owners of single file
+    const unsigned int match_end = match_arr.count;
 
     // fill first element
+    fill_ebuild(0,0);
 
-    for (unsigned int i=1; i<match_arr.count; i++)
+    for (unsigned int i=1; i<match_end; i++)
     {
-        match = match_arr.match[i];
+        // switch to next element in ebuild array if file from
+        // match array changed (we can use this because file
+        // records are filled sequentially)
+        if (match_arr.match[i][mtype.file] != match_arr.match[i-1][mtype.file])
+            idx++;
+        fill_ebuild(i, idx);
     }
 }
 
