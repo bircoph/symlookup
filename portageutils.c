@@ -39,6 +39,7 @@
 /* 2D array of ebuilds corresponding to file_arr */
 struct str_t *ebuild_arr;
 extern struct str_t file_arr;
+char *const str_ebuild_nf = "<ebuild not found>";
 
 /* disables ebuild support */
 static void ebuild_disable(void)
@@ -80,9 +81,10 @@ static inline void
 process_list(char *ptr, const char *const mbuf_end,
              const char *const package_name, const size_t package_len)
 {
-    char *begin;
-    ENTRY request, *result;
-    struct str_t *ebuild;  // current element of ebuild array
+    static char *begin;
+    static ENTRY request;
+    static ENTRY *result;
+    static struct str_t *ebuild;  // current element of ebuild array
 
     for (; ptr < mbuf_end; ptr++)
     {
@@ -119,6 +121,49 @@ process_list(char *ptr, const char *const mbuf_end,
         ebuild->str[ebuild->size][package_len] = '\0';
         // grow ebuild array
         ebuild->size++;
+    }
+}
+
+/* Fills ebuild data in the match array,
+ * if several owners were found grows match array as needed.
+ * match_idx  - index in match array to fill; 
+ * ebuild_idx - index in ebuild array to use */
+static void fill_ebuild(const unsigned int match_idx, const unsigned int ebuild_idx)
+{
+    static char **match;
+    static struct str_t *ebuild;
+    match = match_arr.match[match_idx];
+    ebuild = &ebuild_arr[ebuild_idx];
+
+    match[mtype.ebuild] = ebuild->size ? ebuild->str[0] : str_ebuild_nf;
+
+    // add extra matches (should be rare case, but still possible)
+    if (ebuild->size > 1)
+    {
+        match_arr.count += ebuild->size - 1;
+        match_arr.match = xrealloc(match_arr.match, sizeof(char**) * match_arr.count);
+        
+        /* In case of match grouped output an appropriate match
+         * pointer MUST be found in symbol structure.
+         * This is inefficient, but such cases shoulde be very rare
+         * (and must be absent on clean system at all) and overhead
+         * of alternative implementation is too large. */
+        if (opt.sort.match)
+        {
+        }
+
+        // fill new records
+        for (unsigned int i = match_arr.count - ebuild->size + 1; i < match_arr.count; i++)
+        {
+            match_arr.match[i] = xmalloc(sizeof(char*) * M_SAVEMEM);
+            match_arr.match[i][mtype.symbol] = match[mtype.symbol];
+            match_arr.match[i][mtype.file] = match[mtype.file];
+            match_arr.match[i][mtype.file] = ebuild->str[match_arr.count - i];
+#ifdef HAVE_RPM
+            if (opt.rpm)
+                match_arr.match[i][mtype.rpm] = match[mtype.rpm];
+#endif //HAVE_RPM
+        }
     }
 }
 
@@ -290,6 +335,18 @@ void find_ebuilds(const struct str_t *const file)
     free(contents);
     free(category);
     hdestroy();
+
+    /* Fill ebuild field in match array.
+     * Take advantage of sequential file filling in match array */
+    char **match;         // pointer to current match data
+    unsigned int idx = 0; // index in ebuild and file arrays
+
+    // fill first element
+
+    for (unsigned int i=1; i<match_arr.count; i++)
+    {
+        match = match_arr.match[i];
+    }
 }
 
 #endif //HAVE_PORTAGE
