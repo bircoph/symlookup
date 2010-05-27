@@ -159,15 +159,35 @@ static void readelf(Elf* const elf, const char* const filename, const unsigned i
  * full file name from the root of traversal (in order to show it for
  * user), and last name only, it is already returned by fts,
  * so I won't waste CPU time */
-int checkfile (const char* const filename,
-               const char* const fullfilename,
-               const char* const name)
+void checkfile (const char* const filename,
+                const char* const fullfilename,
+                const char* const name)
 {
     static unsigned int so, ar;
     static int fd;
     static Elf *elf, *elf_ar;   //elf, Ar object pointer
     static Elf_Kind elf_type;   //elf type enum
 
+    /* name regular expression check */
+    if (opt.file_re) {
+        int res_code;
+        res_code = regexec(opt.file_re, name, 0, NULL, 0);
+        switch (res_code) {
+            case REG_NOMATCH:
+                return;
+                break;
+            case 0:
+                break;
+            default:
+                if (opt.verb) {
+                    regerror(res_code, opt.file_re, reg_error_str, reg_error_str_len);
+                    error(0, errno, "warning: can't execute file name regular expression: %s",
+                          reg_error_str);
+                }
+                break;
+        }
+    }
+    /* extension check */
     if (opt.ext) {
         // select so by: ".*\.so\..*" || so = ".*\.so$"
         if ( opt.so && (strstr(name, ".so.") ||
@@ -179,7 +199,8 @@ int checkfile (const char* const filename,
             so = 0;
             ar = 1;
         }
-        else return 0;
+        else
+            return;
     }   //skip extension test, only honour CLI options
     else {
         so = opt.so;
@@ -190,7 +211,7 @@ int checkfile (const char* const filename,
     if ((fd = open(filename, O_RDONLY)) == -1) {
         if (opt.verb)
             error(0, errno, "warning: can't open file %s for reading", fullfilename);
-        return 0;
+        return;
     }
     // init elf object
     if (!(elf = elf_begin(fd, ELF_C_READ, NULL)) && opt.verb)
@@ -234,6 +255,5 @@ int checkfile (const char* const filename,
     if (close(fd) == -1 && opt.verb)
         error(0, errno, "error: can't close file %s; "
                         "subsequent processing may be unreliable", fullfilename);
-    return 0;
 }
 

@@ -25,8 +25,8 @@
  * full file name from the root of traversal (in order to show it for
  * user), and last name only, it is already returned by fts,
  * so I won't waste CPU time */
-int checkfile (const char* const filename,
-               const char* const fullfilename,
-               const char* const name);
+void checkfile (const char* const filename,
+                const char* const fullfilename,
+                const char* const name);
 
 #endif /* SL_SCANELF_H */

@@ -124,6 +124,7 @@ struct opt_t {
     int re;             // regexp options flag (extended regexps)
     int fts;            // fts() options
     struct sort_t sort; // sort params
+    regex_t *file_re;   // library file name regular expression 
 };
 extern struct opt_t opt;
 

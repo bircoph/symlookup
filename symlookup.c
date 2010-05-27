@@ -102,7 +102,8 @@ struct opt_t opt = {
 #endif //HAVE_PORTAGE
                    },
         .match   = 0
-    }
+    },
+    .file_re = NULL
 };
 /* decrease M_SAVEMEM by a number of types we can save
  * in the best case*/
@@ -142,14 +143,20 @@ static inline void free_unused()
     }
 #endif //HAVE_RPM
     free_str(&sp);
-}
 
-/* free compiled regexp array */
-static inline void free_regstr()
-{
-    for (unsigned int i=0; i < symbol.size; i++)
-        regfree(&symbol.regstr[i]);
-    free(symbol.regstr);
+    /* free compiled and error regexp data */
+    if (opt.re || opt.file_re)
+    {
+        free(reg_error_str);
+        if (opt.re) {
+            for (unsigned int i=0; i < symbol.size; i++)
+                regfree(&symbol.regstr[i]);
+            free(symbol.regstr);
+        }
+        else
+        if (opt.file_re)
+            regfree(opt.file_re);
+    }
 }
 
 /* matched symbol manipulation */
@@ -433,10 +440,6 @@ int main(const int argc, char *const argv[])
 
     /* free unneeded memory */
     free_unused();
-    if (opt.re) {
-        free(reg_error_str);
-        free_regstr();
-    }
 
 #ifdef HAVE_PORTAGE
     /* search for ebuilds owning files in questions */

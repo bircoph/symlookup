@@ -40,13 +40,17 @@
 extern struct str_t sp; //all search pathes (string array)
 
 /* buffer size for reading lines */
-static size_t line_buf = 512;
+size_t line_buf = 512;
 // strtok stuff
-static char *tail = NULL;       //for strtok fields
+char *tail = NULL;       //for strtok fields
 // field list storage
-static char *field_list = NULL;
+char *field_list = NULL;
+// for file name regular expression
+char *filename_regexp = NULL;
+// flag for file name regular expression case
+unsigned int filename_case = 0;
 // set for already added fields
-static unsigned int field_set = 0;
+unsigned int field_set = 0;
 
 /* grow symbol array by adding new element <str> */
 static void grow_sym(const char* const str)
@@ -652,29 +656,31 @@ static inline void init_packages()
 void parse(const int argc, char* const argv[])
 {
     static struct option long_opt[]= {
-        {"path",       required_argument,NULL,'p'},
-        {"quiet",      no_argument,      NULL,'q'},
-        {"ar",         no_argument,      NULL,'a'},
-        {"ar-only",    no_argument,      NULL,'A'},
-        {"follow",     no_argument,      NULL,'s'},
-        {"xdev",       no_argument,      NULL,'d'},
-        {"noext",      no_argument,      NULL,'X'},
-        {"regexp",     no_argument,      NULL,'r'},
-        {"ignorecase", no_argument,      NULL,'i'},
+        {"path",                required_argument, NULL,'p'},
+        {"quiet",               no_argument,       NULL,'q'},
+        {"ar",                  no_argument,       NULL,'a'},
+        {"ar-only",             no_argument,       NULL,'A'},
+        {"follow",              no_argument,       NULL,'s'},
+        {"xdev",                no_argument,       NULL,'d'},
+        {"noext",               no_argument,       NULL,'X'},
+        {"regexp",              no_argument,       NULL,'r'},
+        {"ignorecase",          no_argument,       NULL,'i'},
+        {"filename-regexp",     required_argument, NULL,'F'},
+        {"filename-ignorecase", no_argument,       NULL,'I'},
 #ifdef HAVE_RPM
-        {"rpm",        no_argument,      NULL,'R'},
-        {"rpm-root",   required_argument,NULL,'z'},
+        {"rpm",                 no_argument,       NULL,'R'},
+        {"rpm-root",            required_argument, NULL,'z'},
 #endif //HAVE_RPM
 #ifdef HAVE_PORTAGE
-        {"ebuild",     no_argument,      NULL,'E'},
-        {"portage-db", required_argument,NULL,'Z'},
+        {"ebuild",              no_argument,       NULL,'E'},
+        {"portage-db",          required_argument, NULL,'Z'},
 #endif //HAVE_PORTAGE
-        {"sort",       optional_argument,NULL,'S'},
-        {"table",      no_argument,      NULL,'t'},
-        {"header",     no_argument,      NULL,'H'},
-        {"help",       no_argument,      NULL,'h'},
-        {"verbose",    no_argument,      NULL,'v'},
-        {"version",    no_argument,      NULL,'V'},
+        {"sort",                optional_argument, NULL,'S'},
+        {"table",               no_argument,       NULL,'t'},
+        {"header",              no_argument,       NULL,'H'},
+        {"help",                no_argument,       NULL,'h'},
+        {"verbose",             no_argument,       NULL,'v'},
+        {"version",             no_argument,       NULL,'V'},
         {0,0,0,0}
     };
     static int c, opt_ind=0;
@@ -683,7 +689,7 @@ void parse(const int argc, char* const argv[])
 
     do  /* reading options */
     {
-        c = getopt_long(argc, argv, "p:aAsdXri"
+        c = getopt_long(argc, argv, "p:aAsdXriF:I"
 #ifdef HAVE_RPM
                                     "R"
 #endif //HAVE_RPM
@@ -726,6 +732,9 @@ void parse(const int argc, char* const argv[])
             "    -r, --regexp                    treat given symbols as extended\n"
             "                                    regular expressions\n"
             "    -i, --ignorecase                ignore case in symbols\n"
+            "    -F, --filename-regexp           select only file names satisfying given\n"
+            "                                    regular expression\n"
+            "    -I, --filename-ignorecase       ignore case in filename reg. expression\n"
 #ifdef HAVE_RPM
             "    -R, --rpm                       find rpms, containing target libs\n"
 #endif //HAVE_RPM
@@ -846,6 +855,14 @@ void parse(const int argc, char* const argv[])
                 opt.cas = 1;
                 compare_func = strcasecmp;
                 break;
+            case 'F':
+                if (filename_regexp)
+                    free(filename_regexp);
+                filename_regexp = alloc_str(optarg);
+                break;
+            case 'I':
+                filename_case = 1;
+                break;
 #ifdef HAVE_RPM
             case 'R':
                 opt.rpm = 1;
@@ -899,6 +916,9 @@ void parse(const int argc, char* const argv[])
     if (opt.verb && opt_a && opt_A)
         error(0, 0, "parse warning: both -a and -A options are specified, "
                     "the last one will take an effect: -%c", (opt.so) ? 'a':'A');
+    if (opt.verb && filename_case && !filename_regexp)
+        error(0, 0, "parse warning: option -I is specified, but -F is not, "
+                    "-I option will be ignored");
 
     // warn if header is requested but table is not
     if (opt.hdr && !opt.tbl) {
@@ -924,11 +944,25 @@ void parse(const int argc, char* const argv[])
     sp.str = xrealloc(sp.str, sizeof(char*) * ++sp.size);
     sp.str[sp.size-1] = NULL;
 
-    if (opt.re) {
-        if (opt.cas)
-            opt.re |= REG_ICASE;
-        //init errmsg buffer
+    // init regexp errmsg buffer
+    if (opt.re || filename_regexp)
         reg_error_str = xmalloc(reg_error_str_len);
+    if (opt.re && opt.cas)
+        opt.re |= REG_ICASE;
+
+    /* Compile regexp for file name */
+    if (filename_regexp) {
+        int err_code,
+            flags = REG_EXTENDED | REG_NOSUB;
+        if (filename_case)
+            flags |= REG_ICASE;
+        //compile regexp
+        if (( err_code = regcomp(opt.file_re, filename_regexp, flags) ))
+        {
+            regerror(err_code, opt.file_re, reg_error_str, reg_error_str_len);
+            error(ERR_PARSE, errno, "failed to compile file name regular expression '%s': %s",
+                  filename_regexp, reg_error_str);
+        }
     }
 
     /* parse sort suboptions, this can't be done in the main switch
