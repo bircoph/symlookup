@@ -57,6 +57,7 @@ static void ebuild_disable(void)
         opt.sort.seq[i-1] = opt.sort.seq[i];
     }
     opt.sort.cnt--;
+    opt.ebuild = 0;
     // ebuild is the last type now, so no need to reduce match
     // type values of other fields
 }
@@ -205,7 +206,7 @@ void find_ebuilds(const struct str_t *const file)
     {
         if (opt.verb)
             error(0, errno, "error: cannot open portage root directory %s. "
-                            "Disabling ebuild support.", opt.portageDB);
+                            "Disabling ebuild support", opt.portageDB);
         ebuild_disable();
         // additional cleanups an this stage
         if (categories >= 0)
