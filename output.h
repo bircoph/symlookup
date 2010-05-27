@@ -25,8 +25,10 @@ extern const char* const str_not_found;
 /* sort if required and output results */
 void sort_output();
 
+#ifdef HAVE_PORTAGE
 /* output unsorted results for ebuild search */
 void ebuild_unsorted_output();
+#endif //HAVE_PORTAGE
 
 /* initialize output (header, formats) */
 void init_output();

@@ -35,7 +35,6 @@
 
 #include "symlookup.h"
 #include "safemem.h"
-#include "output.h"
 #include "rpmutils.h"
 
 /* rpm vars */

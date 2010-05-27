@@ -237,9 +237,33 @@ void sort_output()
 }
 
 /* output unsorted results for ebuild search */
+#ifdef HAVE_PORTAGE
 void ebuild_unsorted_output()
 {
+    if (opt.verb == V_VERBOSE)
+        puts("--> Unsorted ebuild output");
+
+    if (!match_arr.count) {
+        if (opt.verb)
+            puts(str_not_found);
+        return;
+    }
+
+    for (unsigned int i=0; i < match_arr.count; i++)
+    {
+        printf("%s (ebuild: %s", match_arr.match[i][mtype.file],
+                                 match_arr.match[i][mtype.ebuild]);
+#ifdef HAVE_RPM
+        if (opt.rpm) {
+            fputs(", rpm:", stdout);
+            fputs(match_arr.match[i][mtype.rpm], stdout);
+        }
+#endif //HAVE_RPM
+        fputs("): ", stdout);
+        puts(match_arr.match[i][mtype.symbol]);
+    }
 }
+#endif //HAVE_PORTAGE
 
 /* initialize output (header, formats) */
 void init_output()
