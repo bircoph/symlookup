@@ -143,15 +143,6 @@ static void fill_ebuild(const unsigned int match_idx, const unsigned int ebuild_
         match_arr.count += ebuild->size - 1;
         match_arr.match = xrealloc(match_arr.match, sizeof(char**) * match_arr.count);
         
-        /* In case of match grouped output an appropriate match
-         * pointer MUST be found in symbol structure.
-         * This is inefficient, but such cases shoulde be very rare
-         * (and must be absent on clean system at all) and overhead
-         * of alternative implementation is too large. */
-        if (opt.sort.match)
-        {
-        }
-
         // fill new records
         for (unsigned int i = match_arr.count - ebuild->size + 1; i < match_arr.count; i++)
         {
@@ -163,6 +154,26 @@ static void fill_ebuild(const unsigned int match_idx, const unsigned int ebuild_
             if (opt.rpm)
                 match_arr.match[i][mtype.rpm] = match[mtype.rpm];
 #endif //HAVE_RPM
+        }
+
+        /* In case of match grouped output an appropriate match
+         * pointer MUST be found in symbol structure.
+         * This is inefficient, but such cases shoulde be very rare
+         * (and must be absent on clean system at all) and overhead
+         * of alternative implementation is too large. */
+        if (opt.sort.match)
+        {
+            unsigned int i; // i needs to be saved
+            for (i = 0; i < symbol.size; i++)
+                for (unsigned int j = 0; j < symbol.match_count[i]; j++)
+                    if (symbol.match[i][j] == match)
+                        break;
+            // allocate for new match data
+            symbol.match_count[i] += ebuild->size - 1;
+            symbol.match[i] = xrealloc(symbol.match[i], sizeof(char***) * symbol.match_count[i]);
+            // add new matches
+            for (unsigned int k = 1; k < ebuild->size; k++)
+                symbol.match[i][symbol.match_count[i] - k] = match_arr.match[match_arr.count - k];
         }
     }
 }
