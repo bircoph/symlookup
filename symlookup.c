@@ -217,12 +217,12 @@ void do_match(const unsigned int i, const char* const filename,
     match[mtype.file] = file_arr.str[file_arr.size-1];
 
 #ifdef HAVE_RPM
-    static char *const str_rpmnf = "<rpm not found>";
+    static char *const str_rpm_nf = "<rpm not found>";
     if (opt.rpm) {
         static struct str_t *rpmname;
         rpmname = &rpm_arr[file_arr.size-1];
-        //str_rpmnf <=> no match message
-        match[mtype.rpm] = (rpmname->size)? rpmname->str[0] : str_rpmnf;
+        //str_rpm_nf <=> no match message
+        match[mtype.rpm] = (rpmname->size)? rpmname->str[0] : str_rpm_nf;
 
         /* unroll several rpm matches to independent match results,
            so configurable sort can be done easly */
