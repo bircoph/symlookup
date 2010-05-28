@@ -928,10 +928,6 @@ void parse(const int argc, char* const argv[])
         opt.hdr=0;
     }
 
-#if (defined(HAVE_RPM) || defined(HAVE_PORTAGE))
-    init_packages();
-#endif //(defined(HAVE_RPM) || defined(HAVE_PORTAGE))
-
     // user didn't define search paths
     if (!sp.size)
         set_default_path();
@@ -968,11 +964,6 @@ void parse(const int argc, char* const argv[])
         }
     }
 
-    /* parse sort suboptions, this can't be done in the main switch
-       due to dependance on other suboptions */
-    if (opt.sort.cnt)
-        construct_sort_sequence();
-
     /* read from stdin if no symbols are specified */
     if (optind == argc) {
         char *line = xmalloc(line_buf);
@@ -989,10 +980,17 @@ void parse(const int argc, char* const argv[])
                 while ((tail = strtok(NULL, " \t\r\n\f\v")));
         }
         free(line);
-        return;
     }
+    else /* get symbols from command line */
+        while (optind < argc)
+            grow_sym(argv[optind++]);
 
-    /* get symbols from command line */
-    while (optind < argc)
-        grow_sym(argv[optind++]);
+#if (defined(HAVE_RPM) || defined(HAVE_PORTAGE))
+    init_packages();
+#endif //(defined(HAVE_RPM) || defined(HAVE_PORTAGE))
+
+    /* parse sort suboptions, this can't be done in the main switch
+       due to dependance on other suboptions */
+    if (opt.sort.cnt)
+        construct_sort_sequence();
 }
