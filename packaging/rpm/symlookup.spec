@@ -17,7 +17,7 @@
 #
 
 Name: symlookup
-Version: 0.4.0
+Version: 0.5.0
 Release: 1
 Source:  %name-%version.tar.bz2
 Summary: Object symbol search utility
@@ -58,7 +58,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %changelog
 * Sun May 28 2010 Savchenko Andrew <bircoph@users.sourceforge.net>
-- updated for v0.4.0 (new portage support disabled)
+- updated for v0.5.0 (new portage support disabled)
 
 * Sun Apr 25 2010 Savchenko Andrew <bircoph@users.sourceforge.net>
 - updated for v0.3.5

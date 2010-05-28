@@ -1,4 +1,4 @@
-symlookup v0.4.0 Sakura (桜): work is in progress
+symlookup v0.5.0 Sakura (桜): May, 28, 2010
     * Portage support:
       - ebuilds query;
       - support for multiple ownership;
