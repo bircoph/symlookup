@@ -11,7 +11,7 @@ DESCRIPTION="Utility for searching of object files containing requested symbols"
 HOMEPAGE="http://symbol-lookup.sourceforge.net/"
 LICENSE="GPL-3"
 SLOT="0"
-IUSE="-rpm"
+IUSE="+portage -rpm"
 
 [[ ${PV} != *9999* ]] && {
 	SRC_URI="mirror://sourceforge/symbol-lookup/${P}.tar.bz2"
@@ -20,6 +20,7 @@ IUSE="-rpm"
 
 RDEPEND="
 	dev-libs/elfutils
+	portage? ( sys-apps/portage )
 	rpm? ( app-arch/rpm )
 "
 DEPEND="${RDEPEND}"
@@ -30,8 +31,9 @@ src_unpack() {
 
 src_configure() {
 	local myconf="--disable-strip --enable-cflags"
+	use portage || myconf+=" --disable-rpm"
 	use rpm || myconf+=" --disable-rpm"
-	econf ${myconf}|| die "econf failed"
+	econf ${myconf} || die "econf failed"
 }
 
 src_install() {

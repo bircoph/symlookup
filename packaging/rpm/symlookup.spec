@@ -17,7 +17,7 @@
 #
 
 Name: symlookup
-Version: 0.3.5
+Version: 0.4.0
 Release: 1
 Source:  %name-%version.tar.bz2
 Summary: Object symbol search utility
@@ -40,7 +40,7 @@ libraries.
 %setup -q -n %name-%version
 
 %build
-%configure --disable-strip
+%configure --disable-strip --disable-portage
 make %?_smp_mflags
 
 %install
@@ -57,6 +57,9 @@ rm -rf $RPM_BUILD_ROOT
 rm -rf $RPM_BUILD_ROOT
 
 %changelog
+* Sun May 28 2010 Savchenko Andrew <bircoph@users.sourceforge.net>
+- updated for v0.4.0 (new portage support disabled)
+
 * Sun Apr 25 2010 Savchenko Andrew <bircoph@users.sourceforge.net>
 - updated for v0.3.5
 
