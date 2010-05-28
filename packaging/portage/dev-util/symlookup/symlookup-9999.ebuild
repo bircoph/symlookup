@@ -31,7 +31,7 @@ src_unpack() {
 
 src_configure() {
 	local myconf="--disable-strip --enable-cflags"
-	use portage || myconf+=" --disable-ebuild"
+	use portage || myconf+=" --disable-portage"
 	use rpm || myconf+=" --disable-rpm"
 	econf ${myconf} || die "econf failed"
 }
