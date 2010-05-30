@@ -3,7 +3,7 @@
 <pkgmetadata>
 <herd>no-herd</herd>
 <use>
-  <flag name='rpm'>Enable support for RPM database queries. May be useful if <pkg>app-arch/rpm</pkg> is used to install packages outside of portage</flag>
   <flag name='portage'>Enable support for Portage database queries.</flag>
+  <flag name='rpm'>Enable support for RPM database queries. May be useful if <pkg>app-arch/rpm</pkg> is used to install packages outside of portage</flag>
 </use>
 </pkgmetadata>
