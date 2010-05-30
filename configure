@@ -154,7 +154,7 @@ cpu_detect(){
         _sse="yes";
         [[ $_enable_debug == "no" && $_enable_cflags == "no" ]] && {
         #this is experimental, but try it anyway
-            _cflags+=" $_sse_flags"
+            _cflags="$_cflags $_sse_flags"
         }
     }
     echores $_sse
@@ -412,7 +412,7 @@ _incdir_elf=""
 _incdir_rpm="-I/usr/include/rpm"
 _libdir_elf=""
 _libdir_rpm=""
-LDFLAGS+=" --Wl,O1"
+LDFLAGS="$LDFLAGS --Wl,O1"
 unset _incflags
 unset _have_rpm
 unset _have_portage
@@ -542,11 +542,11 @@ echores ${_gcc_ver}.${_gcc_maj}.${_gcc_min}
     else
         #enable additional optimizations for gcc >= 4.3.0
         [[ $_gcc_maj -ge 3 ]] && {
-            _optflags+=" $_optflags_gcc43"
+            _optflags="$_optflags $_optflags_gcc43"
             log "gcc >= 4.3.0 detected, engaging additional compiler flags"
         }
         [[ $_gcc_maj -ge 4 ]] && {
-            _optflags+=" $_optflags_gcc44"
+            _optflags="$_optflags $_optflags_gcc44"
             log "gcc >= 4.4.0 detected, engaging additional compiler flags"
         }
     fi
@@ -617,8 +617,8 @@ then
 else
     echores no
     str="Your compiler seems to be broken, check your system."
-    [[ $_enable_cflags == "yes" ]] && str+="\nOr your CFLAGS are bad."
-    [[ $_cpu_t == "manual" ]] && str+="\nOr your CPU type is bad."
+    [[ $_enable_cflags == "yes" ]] && str="$str\nOr your CFLAGS are bad."
+    [[ $_cpu_t == "manual" ]] && str="$str\nOr your CPU type is bad."
     error "$str"
 fi
 
@@ -639,8 +639,8 @@ else
     echores no
     error "libelf is mandatory, please install it properly\nor specify correct headers and shared object paths"
 fi
-_incflags+=" $_incdir_elf"
-_libs+=" $_libelf_flags $_libdir_elf"
+_incflags="$_incflags $_incdir_elf"
+_libs="$_libs $_libelf_flags $_libdir_elf"
 
 # rpm support
 echocheck "librpm"
@@ -687,9 +687,9 @@ else
 fi
 [[ $_enable_rpm == "yes" ]] || [[ $_enable_rpm == "yes_5" ]] && {
     _have_rpm="HAVE_RPM = yes"
-    _cflags+=" -DHAVE_RPM"
-    _libs+=" $_librpm_flags $_libdir_rpm"
-    [[ $_enable_rpm == "yes_5" ]] && _cflags+=" -DHAVE_RPM_5"
+    _cflags="$_cflags -DHAVE_RPM"
+    _libs="$_libs $_librpm_flags $_libdir_rpm"
+    [[ $_enable_rpm == "yes_5" ]] && _cflags="$_cflags -DHAVE_RPM_5"
 }
 
 # portage support
@@ -712,7 +712,7 @@ else
 fi
 [[ $_enable_portage == "yes" ]] && {
     _have_portage="HAVE_PORTAGE = yes"
-    _cflags+=" -DHAVE_PORTAGE"
+    _cflags="$_cflags -DHAVE_PORTAGE"
 }
 
 ### remove temporary file
