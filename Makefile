@@ -83,6 +83,8 @@ uninstall:
 	rm -f $(DESTDIR)$(mandir)/man1/symlookup.1*
 
 # on distclean per-file deps will be removed anyway
+ifneq ($(MAKECMDGOALS),clean)
 ifneq ($(MAKECMDGOALS),distclean)
 -include $(DEPS)
+endif
 endif
