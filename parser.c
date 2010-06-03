@@ -683,7 +683,7 @@ void parse(const int argc, char* const argv[])
         {"version",             no_argument,       NULL,'V'},
         {0,0,0,0}
     };
-    static int c, opt_ind=0;
+    static int c;
     static unsigned int opt_a=0, opt_A=0, // collision options variables
                         opt_q=0, opt_v=0; //
 
@@ -696,7 +696,7 @@ void parse(const int argc, char* const argv[])
 #ifdef HAVE_PORTAGE
                                     "E"
 #endif //HAVE_PORTAGE
-                                    "S::tHqvhV", long_opt, &opt_ind);
+                                    "S::tHqvhV", long_opt, NULL);
         switch (c) {
             case 'h':
                 printf(
