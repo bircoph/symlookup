@@ -655,7 +655,7 @@ static inline void init_packages()
 
 void parse(const int argc, char* const argv[])
 {
-    static struct option long_opt[]= {
+    const struct option long_opt[]= {
         {"path",                required_argument, NULL,'p'},
         {"quiet",               no_argument,       NULL,'q'},
         {"ar",                  no_argument,       NULL,'a'},
@@ -683,9 +683,9 @@ void parse(const int argc, char* const argv[])
         {"version",             no_argument,       NULL,'V'},
         {0,0,0,0}
     };
-    static int c;
-    static unsigned int opt_a=0, opt_A=0, // collision options variables
-                        opt_q=0, opt_v=0; //
+    int c;
+    unsigned int opt_a=0, opt_A=0, // collision options variables
+                 opt_q=0, opt_v=0; //
 
     do  /* reading options */
     {
