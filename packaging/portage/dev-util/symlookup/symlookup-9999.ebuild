@@ -11,7 +11,7 @@ DESCRIPTION="Utility for searching of object files containing requested symbols"
 HOMEPAGE="http://symbol-lookup.sourceforge.net/"
 LICENSE="GPL-3"
 SLOT="0"
-IUSE="+portage -rpm"
+IUSE="+portage rpm"
 
 [[ ${PV} != *9999* ]] && {
 	SRC_URI="mirror://sourceforge/symbol-lookup/${P}.tar.bz2"
