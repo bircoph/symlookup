@@ -1,3 +1,8 @@
+symlookup v0.5.1 Pino (ぴの): Oct, 12, 2010
+    * Support for older bash-3.x in configure.
+    * Improve and clarify documentation.
+    * Minor fixes.
+
 symlookup v0.5.0 Sakura (桜): May, 28, 2010
     * Portage support:
       - ebuilds query;
