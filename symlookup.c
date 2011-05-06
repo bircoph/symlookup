@@ -297,7 +297,7 @@ int compare_id(register const void* const a, register const void* const b)
 {
     const unsigned long long x = *(const unsigned long long* const)a;
     const unsigned long long y = *(const unsigned long long* const)b;
-    return (x > y) - (x < y);
+    return x - y;
 }
 
 /* free memory for uniq_id tree element */
