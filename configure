@@ -412,7 +412,7 @@ _incdir_elf=""
 _incdir_rpm="-I/usr/include/rpm"
 _libdir_elf=""
 _libdir_rpm=""
-LDFLAGS="$LDFLAGS --Wl,-O1"
+LDFLAGS="$LDFLAGS -Wl,-O1"
 unset _incflags
 unset _have_rpm
 unset _have_portage
