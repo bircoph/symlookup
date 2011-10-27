@@ -1,5 +1,6 @@
 symlookup v0.5.2 Fuu (ふう) [under process]
-    * Fix default LDFLAGS for gcc-4.6.x
+    * Fix default LDFLAGS for gcc-4.6.x.
+    * Use reentrant strtok_r() to avoid heap corruction in elibc().
     * Optimize comparision function.
 
 symlookup v0.5.1 Pino (ぴの): Oct, 12, 2010

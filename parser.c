@@ -522,8 +522,9 @@ static void parse_ld_so_conf_include (const char* const filename, const char* pa
 static void parse_ld_so_conf (const char* const filename)
 {
     FILE *fd = fopen (filename, "r");
-    char *line, //buffer for line
-         *p;    //temporary pointer into the line
+    char *line,     // buffer for line
+         *p,        // temporary pointer into the line
+         *tok_buf;  // buffer for reentrant strtok_r()
     if (!fd) {
         if (opt.verb)
             error(0, errno, "error: can't open ld config file %s for reading;\n"
@@ -545,17 +546,17 @@ static void parse_ld_so_conf (const char* const filename)
             *p = '\0';
 
         /* Remove leading whitespace.  NUL is no whitespace character.  */
-        if (!(tail = strtok(line, " \f\r\t\v")))
+        if (!(tail = strtok_r(line, " \f\r\t\v", &tok_buf)))
             continue;
 
         //check for "include" keyword
         if (!strcmp(tail, "include"))
-            while ((tail = strtok(NULL, " \t")))
+            while ((tail = strtok_r(NULL, " \t", &tok_buf)))
                 parse_ld_so_conf_include (filename, tail);
         else {
             //allow '=' character in the same way as ld
             if (!strcmp(tail,"="))
-                tail = strtok(NULL, " \f\r\t\v");
+                tail = strtok_r(NULL, " \f\r\t\v", &tok_buf);
             grow_str(&sp, tail);
         }
     }
