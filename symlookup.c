@@ -1,6 +1,6 @@
 /*
  *  symlookup main
- *  Copyright © 2007-2010 Andrew Savchenko
+ *  Copyright © 2007-2011 Andrew Savchenko
  *  Project created 04.03.2007 16:50:05 MSK (GMT+3)
  *
  *  This file is part of symlookup.
