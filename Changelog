@@ -1,3 +1,7 @@
+symlookup v0.5.2 Fuu (ふう) [under process]
+    * Fix default LDFLAGS for gcc-4.6.x
+    * Optimize comparision function.
+
 symlookup v0.5.1 Pino (ぴの): Oct, 12, 2010
     * Support for older bash-3.x in configure.
     * Improve and clarify documentation.
