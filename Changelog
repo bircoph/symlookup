@@ -2,8 +2,8 @@ symlookup v0.5.2 Fuu (ふう) Oct, 28, 2011
     * Fix default LDFLAGS for gcc-4.6.x.
     * Use reentrant strtok_r() to avoid heap corruction in elibc().
       Thanks xaionaro for bug reports.
-    * Optimize comparision function.
     * Add deb package (no deb queries supported, only packaging).
+    * Minor optimizations and fixes.
     * Documentation update.
 
 symlookup v0.5.1 Pino (ぴの): Oct, 12, 2010

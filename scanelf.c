@@ -209,7 +209,7 @@ void checkfile (const char* const filename,
 
     /* preliminary reading of ELF-file */
     if ((fd = open(filename, O_RDONLY)) == -1) {
-        if (opt.verb)
+        if (opt.verb >= V_VERBOSE)
             error(0, errno, "warning: can't open file %s for reading", fullfilename);
         return;
     }
