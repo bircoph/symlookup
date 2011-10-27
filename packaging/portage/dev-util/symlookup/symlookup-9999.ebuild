@@ -1,8 +1,8 @@
-# Copyright 1999-2010 Gentoo Foundation
+# Copyright 1999-2011 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
-EAPI="3"
+EAPI="4"
 
 [[ ${PV} = *9999* ]] && inherit subversion
 ESVN_REPO_URI="https://symbol-lookup.svn.sourceforge.net/svnroot/symbol-lookup/trunk"
@@ -34,9 +34,4 @@ src_configure() {
 	use portage || myconf+=" --disable-portage"
 	use rpm || myconf+=" --disable-rpm"
 	econf ${myconf} || die "econf failed"
-}
-
-src_install() {
-	emake DESTDIR="${D}" install || die "emake install failed"
-	prepalldocs
 }
