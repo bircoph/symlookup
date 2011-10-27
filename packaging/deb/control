@@ -1,0 +1,12 @@
+Package: symlookup
+Version: 0.5.2
+Architecture: amd64
+Maintainer: Andrew Savchenko <bircoph@gmail.com>
+Depends: libc6 (>= 2.3.4), libelf1 (>= 0.123)
+Section: utils
+Priority: extra
+Homepage: http://sourceforge.net/projects/symbol-lookup/
+Description: Utility for object symbol search in installed libraries.
+ This program searches for both dynamic and static libraries, looking
+ those ones which provide given object symbols. It will assist you in
+ undefined symbol errors eliminating.
