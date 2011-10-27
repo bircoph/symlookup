@@ -14,7 +14,7 @@ SLOT="0"
 IUSE="+portage rpm"
 
 [[ ${PV} != *9999* ]] && {
-	SRC_URI="mirror://sourceforge/symbol-lookup/${P}.tar.bz2"
+	SRC_URI="mirror://sourceforge/symbol-lookup/${P}.tar.xz"
 	KEYWORDS="~x86 ~amd64"
 } || KEYWORDS=""
 
