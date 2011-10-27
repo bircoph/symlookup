@@ -1,5 +1,5 @@
 # symlookup spec file
-# Copyright © 2007-2010 Andrew Savchenko
+# Copyright © 2007-2011 Andrew Savchenko
 #
 # This file is part of symlookup.
 #
@@ -17,7 +17,7 @@
 #
 
 Name: symlookup
-Version: 0.5.1
+Version: 0.5.2
 Release: 1
 Source:  %name-%version.tar.bz2
 Summary: Object symbol search utility

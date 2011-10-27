@@ -2,7 +2,7 @@ Welcome to symlookup!
 
 This is an utility for searching object symbols in system
 libraries (both dynamic and static) and not only in them.
-In particular it will be useful in troubleshooting
+In particular it will be useful for troubleshooting
 "unresolved symbol" errors.
 
 This program is distributed under the terms of explicitly
@@ -31,9 +31,8 @@ Mandatory:
 
 Optional:
 
-- librpm required for rpm support, version 4.x must be used. 
-  rpm-5 will not be supported until RHEL or at least Fedora will
-  move to it.
+- librpm required for rpm support, both 4.x and 5.x versions
+  may be used. 
 
 ______________
 How to obtain:
@@ -54,14 +53,14 @@ _____________
 Installation:
 ~~~~~~~~~~~~~
 Compiler and build options can be tweaked via $CC, $CFLAGS,
-$LFLAGS and $DESTDIR environment variables.
+$LDFLAGS and $DESTDIR environment variables.
 
 To configure program type:
 ./configure
 See ./configure --help for more details.
 Please note, configure script is smart enough and can detect
 even your CPU optimizations flags automatically (but better
-use gcc >= 4.2.0).
+use gcc >= 4.2.0 with native architecture support).
 
 To compile program type:
 make
@@ -87,11 +86,18 @@ It is advisable to use some package system instead of just using
 make install. This will help to keep your system in order and will
 simplify its maintenance.
 
-Currently only rpm for Scientific Linux CERN and ebuild for Gentoo
-are provided.
+Currently supported package systems:
+- deb (tested on Debian);
+- portage (works for any Gentoo);
+- rpm (tested on Scientific Linux CERN).
 
-Put ebuild in your local overlay and use it as usual.
+1) dpkg
+Install packages as usual via dpkg or apt-get.
 
+2) portage
+Put ebuild in your local overlay and use it as usual via emerge.
+
+3) rpm
 To make your own rpm for desired architecture:
 1) copy symlookup.spec file to your SPECS dir, tune it as
 required for your system if needed;

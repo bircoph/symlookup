@@ -1,6 +1,6 @@
 /*
  *  CLI parser and program configurer
- *  Copyright © 2007-2010 Andrew Savchenko
+ *  Copyright © 2007-2011 Andrew Savchenko
  *
  *  This file is part of symlookup.
  *

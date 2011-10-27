@@ -1,5 +1,5 @@
 .\" symlookup manual page
-.\" Copyright © 2007-2010 Andrew Savchenko
+.\" Copyright © 2007-2011 Andrew Savchenko
 .\"
 .\" This file is part of symlookup.
 .\"
@@ -15,7 +15,7 @@
 .\" You should have received a copy of the GNU General Public License version 3
 .\" along with symlookup. If not, see <http://www.gnu.org/licenses/>.
 .\"
-.TH symlookup 1 "12 Oct 2010" "version 0.5.1" "Symbol Lookup Utility"
+.TH symlookup 1 "28 Oct 2011" "version 0.5.2" "Symbol Lookup Utility"
 .SH NAME
 symlookup \- search for symbols in object files
 .SH SYNOPSIS
@@ -38,10 +38,10 @@ static symbol libraries. It looks up for libraries where given
 symbols are defined and optionally can find packages holding these
 libraries.
 
-By default search is performed in the standard system paths
+By default a search is performed in the standard system paths
 recursively, looking into dynamic libraries only, and omitting
 symbolic links.
-But program's behaviour may be fully customized by the command line
+But a program's behaviour may be fully customized by the command line
 options.
 Default system paths are determined in the same way as
 .BR ld (1)
@@ -57,7 +57,7 @@ engine for obtained results, see
 below.
 
 Optional support for package management systems is present, it is
-configurable at compile time.
+configurable at a compile time.
 Currently
 .BR rpm (8)
 and
@@ -80,7 +80,7 @@ archives
 .IR only .
 .TP
 .BR -d ", " --xdev
-Stay on the same physical device as search path directory.
+Stay on the same physical device as a search path directory.
 Useful if you don't want to descend into other file systems
 mounted inside root search directories.
 .TP
@@ -107,7 +107,7 @@ This option is useless without
 .BR -p ", "
 .BI "--path " <PATH1:PATH2:...>
 .RS
-Specify path(s) for library search, this will override defaults,
+Specify path(s) for a library search, this will override defaults,
 not extend them. Each physical file will be analysed once, even
 for overlapped paths or multiple hardlinks.
 .RE
@@ -124,8 +124,8 @@ to the libraries in the same directory.
 .TP
 .BR -X ", " --noext
 Do not perform an extension check for files in question. By default
-".*\\.so\\..*" and ".*\\.so$" patterns are checked against shared
-objects and ".*\\.a$" against ar archives. (If these patterns confuse
+".*\\.so\\..*" and ".*\\.so$" patterns are checked for shared
+objects and ".*\\.a$" for ar archives. (If these patterns confuse
 you, look at
 .BR grep (1)
 manual to understand them.)
@@ -140,7 +140,7 @@ options are specified together, the last one will take an effect.
 .SH OUTPUT OPTIONS
 .TP
 .BR -H ", " --header
-Show header when results are displayed as a table.
+Show a header when results are displayed as a table.
 Only valid with
 .B -t
 option.
@@ -183,7 +183,7 @@ and
 package management systems.
 It may be enabled or disabled via configure script.
 It is OK to use several package management systems at once (thought
-that kind of setup is rare).
+this kind of setup is rather rare).
 Of course, the following options are only valid if program was
 compiled with an appropriate package management support.
 
@@ -193,11 +193,11 @@ compiled with an appropriate package management support.
 Search for rpms owning found libraries.
 .TP
 .BR --rpm-root
-Specify path to rpm root directory.
-Please not, this is not path to rpm database directory, but rather
-to chroot directory holding this database; so this patch will be
-prefixed to /var/lib/rpmdir or whatever is used by rpm on your
-system.
+Specify a path to the rpm root directory.
+Please note, this is not a path to the rpm database directory, but
+rather to a chroot directory holding this database; so this patch
+will be prefixed to /var/lib/rpmdir or whatever is used by rpm on
+your system.
 .PP
 .RB "An additional " rpm
 search field is available for sort requests.
@@ -216,9 +216,9 @@ does, so you can attune its behaviour via rpm config files as well.
 Search for ebuilds owning found libraries.
 .TP
 .BR --portage-db
-Specify path to portage database root directory.
-Usually this is /var/db/pkg, but may differ on chroot or similar
-conditions.
+Specify a path to the portage database root directory.
+Usually this is /var/db/pkg, but may differ if you are using prefix
+setup, or chroot or similar conditions.
 .PP
 .RB "An additional " ebuild
 search field is available for sort requests.
@@ -231,7 +231,7 @@ Immediate output of unsorted results is not possible for ebuild
 queries because portage data base implementation is highly
 inefficient for ownership queries.
 All matched files will be queried at once and results will be
-output in the very end of program execution.
+output in the very end of the program execution.
 .\" ****************************************************************
 .SH GENERAL OPTIONS
 .TP
@@ -244,12 +244,12 @@ Display version information and exit.
 .SH SORTING
 
 .B symlookup
-provides rather powerful sort system for matches found. Thus it
-may be useful not only for particular symbols definition search,
-but also for analysis of large library sets or entire system.
+provides a rather powerful sort system for matches found. Thus it
+may be useful not only for a particular symbols definition search,
+but also for an analysis of large library sets or an entire system.
 
 Results collation is performed sequentially according to the list
-of fields provided. Fields in the list must be separated by comma,
+of fields provided. Fields in the list must be separated by a comma,
 no spaces, tabs and other delimiters are allowed. If short sort
 option
 .B -S
@@ -260,8 +260,8 @@ follow the '=' sign or space.
 Valid field values are:
 .TP
 .I match
-Sort results separately for each symbol pattern provided by user;
-if neither
+Sort results separately for an each symbol pattern provided by the
+user; if neither
 .BR -i " nor " -r
 is provided this option is useless and will be ignored, because
 exact match search is performed in this case. It must be the first
@@ -345,7 +345,7 @@ You should
 .I not
 run
 .B symlookup
-as root.
+as a root.
 Though this program was carefully developed to check all possible
 error conditions and to ensure NULL-terminated strings whenever
 possible, it still uses intensive string I/O and there is no
@@ -431,3 +431,7 @@ describes Gentoo portage packaging system.
 .BR ebuild (1),
 .BR q (1)
 are powerful portage manipulation utilities.
+.PP
+.BR dpkg (1),
+.BR dpkg-deb (1)
+are the main tools to manipulate and examine deb pakges.
