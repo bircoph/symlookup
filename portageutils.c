@@ -237,7 +237,7 @@ void find_ebuilds(const struct str_t *const file)
     ebuild_arr = xmalloc(len_earr);
     memset(ebuild_arr, 0, len_earr);
 
-    if (opt.verb == V_VERBOSE)
+    if (opt.verb >= V_VERBOSE)
         puts("--> Searching portage database");
 
     /***** portage DB tree loop data declarations *****/

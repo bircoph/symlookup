@@ -209,7 +209,7 @@ static void print_result(char*** const match, const unsigned int count,
 /* sort if required and output results */
 void sort_output()
 {
-    if (opt.verb == V_VERBOSE)
+    if (opt.verb >= V_VERBOSE)
         puts("--> Preparing for output results");
 
     /* sort by match is done separately */
@@ -242,7 +242,7 @@ void sort_output()
 #ifdef HAVE_PORTAGE
 void ebuild_unsorted_output()
 {
-    if (opt.verb == V_VERBOSE)
+    if (opt.verb >= V_VERBOSE)
         puts("--> Unsorted ebuild output");
 
     if (!match_arr.count) {

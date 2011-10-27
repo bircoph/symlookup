@@ -348,7 +348,7 @@ static inline void fts_scan()
     void *leaf;                     // leaf in the tree
     unsigned int need_alloc = 1;    // flag for allocation memory required;
 
-    if (opt.verb == V_VERBOSE)
+    if (opt.verb >= V_VERBOSE)
         puts("--> Iterating search tree");
 
     /* iterate through file hierarchy */
