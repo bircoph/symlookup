@@ -54,7 +54,7 @@ Compilation options:
  --enable-cflags    honor CFLAGS enviroment variable [disabled]
  --disable-strip    do not strip binaries [enabled]
 
-Useful eviromental variables:
+Useful environmental variables:
  CFLAGS             tweak compiler flags (overrides optimization defaults and --cpu,
                     but disabled by default: autodetection should work fine)
  LDFLAGS            additional linker flags

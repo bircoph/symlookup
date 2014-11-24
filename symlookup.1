@@ -24,10 +24,10 @@ symlookup \- search for symbols in object files
 .RI "[" options "] [" symbols "]"
 .br
 .B symlookup
-[-h | --help]
+[\-h | \-\-help]
 .br
 .B symlookup
-[-V | --version]
+[\-V | \-\-version]
 .br
 .\" ****************************************************************
 .SH DESCRIPTION
@@ -68,23 +68,23 @@ Fore more details refer to
 .\" ****************************************************************
 .SH QUERY OPTIONS
 .TP
-.BR -a ", " --ar
+.BR \-a ", " \-\-ar
 Search in the
 .BR ar (1)
 archives altogether with shared object libraries.
 .TP
-.BR -A ", " --ar-only
+.BR \-A ", " \-\-ar-only
 Search in the
 .BR ar (1)
 archives
 .IR only .
 .TP
-.BR -d ", " --xdev
+.BR \-d ", " \-\-xdev
 Stay on the same physical device as a search path directory.
 Useful if you don't want to descend into other file systems
 mounted inside root search directories.
 .TP
-.BR -F ", " --filename-repexp
+.BR \-F ", " \-\-filename\-repexp
 Limit library file names by specified extended regular expression.
 See 
 .BR grep (1)
@@ -92,19 +92,19 @@ for syntax details.
 Leading directory name is not affected by this filter.
 Please note: extension check limitations are still active with this
 option, use
-.B -X
+.B \-X
 to disable them if you really want.
 .TP
-.BR -i ", " --ignorecase
+.BR \-i ", " \-\-ignorecase
 Ignore case in symbol names or appropriate extended regular
 expressions.
 .TP
-.BR -I ", " --filename-ignorecase
+.BR \-I ", " \-\-filename\-ignorecase
 Ignore case in file name extended regular expression.
 This option is useless without
 .BR -F .
 .P
-.BR -p ", "
+.BR \-p ", "
 .BI "--path " <PATH1:PATH2:...>
 .RS
 Specify path(s) for a library search, this will override defaults,
@@ -112,17 +112,17 @@ not extend them. Each physical file will be analysed once, even
 for overlapped paths or multiple hardlinks.
 .RE
 .TP
-.BR -r ", " --repexp
+.BR \-r ", " \-\-repexp
 Treat given symbols as extended regular expressions likewise
 .BR grep (1)
 instead of search for direct match.
 .TP
-.BR -s ", " --follow
+.BR \-s ", " \-\-follow
 Follow symbolic links instead of omitting them. Be careful: often
 this is just waste of time, because symbolic links usually refer
 to the libraries in the same directory.
 .TP
-.BR -X ", " --noext
+.BR \-X ", " \-\-noext
 Do not perform an extension check for files in question. By default
 ".*\\.so\\..*" and ".*\\.so$" patterns are checked for shared
 objects and ".*\\.a$" for ar archives. (If these patterns confuse
@@ -132,29 +132,29 @@ manual to understand them.)
 .TP
 .I Note:
 if
-.B -a
+.B \-a
 and
-.B -A
+.B \-A
 options are specified together, the last one will take an effect.
 .\" ****************************************************************
 .SH OUTPUT OPTIONS
 .TP
-.BR -H ", " --header
+.BR \-H ", " \-\-header
 Show a header when results are displayed as a table.
 Only valid with
-.B -t
+.B \-t
 option.
 .TP
-.BR -q ", " --quiet
+.BR \-q ", " \-\-quiet
 Be quiet. Show only fatal error messages with few exceptions. This
 will also skip some non-mandatory sanity checks, thus making
 program running a bit faster but less informative.
 .TP
-.BR -v ", " --verbose
+.BR \-v ", " \-\-verbose
 Be more verbose than by default. This will enable some annoying
 messages.
 .P
-.BR -S ", "
+.BR \-S ", "
 .BI "--sort " [field,...]
 .RS
 Sort search results. You can arrange collation subsequence order,
@@ -163,14 +163,14 @@ see
 below.
 .RE
 .TP
-.BR -t ", " --table
+.BR \-t ", " \-\-table
 Print search results as a table.
 .TP
 .I Note:
 if
-.B -q
+.B \-q
 and
-.B -v
+.B \-v
 options are specified together, the last one will take an effect.
 .\" ****************************************************************
 .SH PACKAGE MANAGEMENT OPTIONS
@@ -189,10 +189,10 @@ compiled with an appropriate package management support.
 
 .I RPM OPTIONS
 .TP
-.BR -R ", " --rpm
+.BR \-R ", " \-\-rpm
 Search for rpms owning found libraries.
 .TP
-.BR --rpm-root
+.BR \-\-rpm-root
 Specify a path to the rpm root directory.
 Please note, this is not a path to the rpm database directory, but
 rather to a chroot directory holding this database; so this patch
@@ -212,10 +212,10 @@ does, so you can attune its behaviour via rpm config files as well.
 
 .I PORTAGE OPTIONS
 .TP
-.BR -E ", " --ebuild
+.BR \-E ", " \-\-ebuild
 Search for ebuilds owning found libraries.
 .TP
-.BR --portage-db
+.BR \-\-portage\-db
 Specify a path to the portage database root directory.
 Usually this is /var/db/pkg, but may differ if you are using prefix
 setup, or chroot or similar conditions.
@@ -235,10 +235,10 @@ output in the very end of the program execution.
 .\" ****************************************************************
 .SH GENERAL OPTIONS
 .TP
-.BR -h ", " --help
+.BR \-h ", " \-\-help
 Show help message, usage information and exit.
 .TP
-.BR -V ", " --version
+.BR \-V ", " \-\-version
 Display version information and exit.
 .\" ****************************************************************
 .SH SORTING
@@ -262,7 +262,7 @@ Valid field values are:
 .I match
 Sort results separately for an each symbol pattern provided by the
 user; if neither
-.BR -i " nor " -r
+.BR \-i " nor " \-r
 is provided this option is useless and will be ignored, because
 exact match search is performed in this case. It must be the first
 sort field if provided.
@@ -275,13 +275,13 @@ Sort by file name containing matched symbols.
 .TP
 .I ebuild
 Sort by ebuild owning matched file; it is useless if
-.B -E
+.B \-E
 is unspecified and will be ignored. Option is valid only if program
 is compiled with ebuild support.
 .TP
 .I rpm
 Sort by rpm owning matched file; it is useless if
-.B -R
+.B \-R
 is unspecified and will be ignored. Option is valid only if program
 is compiled with rpm support.
 .P
@@ -300,7 +300,7 @@ much more memory than for ordinary execution.
 
 For this stress test:
 .RS
-symlookup -arR --sort=rpm,file,symbol ".*"
+symlookup \-arR \-\-sort=rpm,file,symbol ".*"
 .RE
 a peak memory usage was about 137 MB on my system with about 7000
 both dynamic and static libraries installed.
