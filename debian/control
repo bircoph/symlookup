@@ -1,0 +1,17 @@
+Source: symlookup
+Section: devel
+Priority: optional
+Maintainer: Dmitry Yu Okunev <dyokunev@ut.mephi.ru>
+Build-Depends: debhelper (>= 9), libelf-dev
+Standards-Version: 3.9.6
+Homepage: http://sourceforge.net/projects/symbol-lookup/
+#Vcs-Git: git://anonscm.debian.org/collab-maint/symlookup.git
+#Vcs-Browser: http://anonscm.debian.org/?p=collab-maint/symlookup.git;a=summary
+
+Package: symlookup
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Utility for object symbol search in installed libraries
+ This program searches for both dynamic and static libraries, looking
+ those ones which provide given object symbols. It will assist you in
+ undefined symbol errors eliminating.
